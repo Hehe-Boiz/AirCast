@@ -22,10 +22,11 @@ WORKDIR /app
 
 COPY --from=builder /opt/venv /opt/venv
 
+RUN python manage.py collectstatic --noinput
 COPY . .
 
 ENV PATH="/opt/venv/bin:$PATH"
 
 EXPOSE 8000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "AirCast.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "aircast.wsgi:application"]

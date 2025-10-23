@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import Profile, Report, Achievement, UserAchievement
-from django.contrib.auth.models import User
+from .models import Profile, Achievement, UserAchievement
+from ..reports.models import ReportDetailed as Report
+from ..authentication.models import User
 
 class UserStatsSerializer(serializers.ModelSerializer):
     accuracy_rate = serializers.FloatField(source='profile.accuracy_rate', read_only=True)
