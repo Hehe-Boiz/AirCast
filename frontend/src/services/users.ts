@@ -114,18 +114,12 @@ class UsersService {
   
   // Get user statistics
   async getUserStats(): Promise<UserStatsResponse> {
-    // MOCK MODE
-    if (API_CONFIG.USE_MOCK_DATA) {
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      return {
-        total_reports: 47,
-        accuracy_rate: 94,
-        current_streak: 12,
-        level: 8,
-        reputation: 85,
-      };
-    }
+
+    // total_reports: 47,
+    // accuracy_rate: 94,
+    // current_streak: 12,
+    // level: 8,
+    // reputation: 85,
 
     // REAL API CALL
     return apiService.get<UserStatsResponse>(API_CONFIG.ENDPOINTS.USER_STATS);
