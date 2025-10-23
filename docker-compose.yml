@@ -1,0 +1,14 @@
+services:
+  db:
+    build: ./postgre_docker
+    image: my-postgres-aircast
+    container_name: aircast-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
