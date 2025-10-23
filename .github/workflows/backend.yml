@@ -4,11 +4,11 @@ on:
   push:
     branches: [ CICD ]
     paths:
-      - 'Backend/**'
+      - 'backend/**'
   pull_request:
     branches: [ main ]
     paths:
-      - 'Backend/**'
+      - 'backend/**'
 
 jobs:
   lint-backend:
@@ -16,7 +16,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./Backend
+        working-directory: ./backend
         shell: bash
 
     steps:

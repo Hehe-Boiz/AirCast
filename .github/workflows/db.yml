@@ -3,12 +3,8 @@ name: Database Setup
 on:
   push:
     branches: [ CICD ]
-    paths:
-      - 'Backend/**'
   pull_request:
     branches: [ main ]
-    paths:
-      - 'Backend/**'
 
 jobs:
   lint-backend:

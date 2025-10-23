@@ -3,14 +3,14 @@ on:
   pull_request:
     branches: [ main ]
     paths:
-      - 'Frontend/**'
+      - 'frontend/**'
 jobs:
   lint-frontend:
     runs-on: ubuntu-latest
 
     defaults:
       run:
-        working-directory: ./Frontend
+        working-directory: ./frontend
         shell: bash
 
     steps:
@@ -23,7 +23,6 @@ jobs:
           node-version: '20.x'
 
       - name: Install and Lint
-        working-directory: ./Frontend
         run: |
           npm install
           npm run lint
