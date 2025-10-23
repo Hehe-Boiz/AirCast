@@ -12,9 +12,10 @@ import { Textarea } from './ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Upload, Mic, Smile, Frown, AlertTriangle, Skull, Volume2, VolumeX, Send, Camera, Image as ImageIcon, X } from 'lucide-react';
 import { toast } from 'sonner';
-import type { User, AirQualityLevel, NoiseLevel } from '../App';
+import { AIR_LEVEL, NOISE_LEVEL, type User} from '../App';
 import { reportsService } from '../services';
 import { OptionButton } from './OptionButton';
+
 
 type ReportModalProps = {
   isOpen: boolean;
@@ -26,8 +27,8 @@ type ReportModalProps = {
 
 export function ReportModal({ isOpen, onClose, user, location, onReportCreated }: ReportModalProps) {
   const [reportType, setReportType] = useState<'air' | 'noise'>('air');
-  const [airQuality, setAirQuality] = useState<AirQualityLevel | null>(null);
-  const [noiseLevel, setNoiseLevel] = useState<NoiseLevel | null>(null);
+  const [airQuality, setAirQuality] = useState<AIR_LEVEL | null>(null);
+  const [noiseLevel, setNoiseLevel] = useState<NOISE_LEVEL | null>(null);
   const [comment, setComment] = useState('');
   const [image, setImage] = useState<File | null>(null);
   const [audio, setAudio] = useState<File | null>(null);
@@ -141,40 +142,40 @@ export function ReportModal({ isOpen, onClose, user, location, onReportCreated }
                         icon={<Smile className="w-8 h-8" />}
                         label="Tốt"
                         description="0-50 AQI"
-                        isSelected={airQuality === 'good'}
-                        onClick={() => setAirQuality('good')}
+                        isSelected={airQuality === AIR_LEVEL.GOOD}
+                        onClick={() => setAirQuality(AIR_LEVEL.GOOD)}
                         variant="green"
                       />
                       <OptionButton
                         icon={<Smile className="w-8 h-8" />}
                         label="Trung bình"
                         description="51-100 AQI"
-                        isSelected={airQuality === 'moderate'}
-                        onClick={() => setAirQuality('moderate')}
+                        isSelected={airQuality === AIR_LEVEL.MODERATE}
+                        onClick={() => setAirQuality(AIR_LEVEL.MODERATE)}
                         variant="yellow"
                       />
                       <OptionButton
                         icon={<Frown className="w-8 h-8" />}
                         label="Kém"
                         description="101-150 AQI"
-                        isSelected={airQuality === 'unhealthy'}
-                        onClick={() => setAirQuality('unhealthy')}
+                        isSelected={airQuality === AIR_LEVEL.UNHEALTHY}
+                        onClick={() => setAirQuality(AIR_LEVEL.UNHEALTHY)}
                         variant="orange"
                       />
                       <OptionButton
                         icon={<AlertTriangle className="w-8 h-8" />}
                         label="Xấu"
                         description="151-200 AQI"
-                        isSelected={airQuality === 'very_unhealthy'}
-                        onClick={() => setAirQuality('very_unhealthy')}
+                        isSelected={airQuality === AIR_LEVEL.VERY_UNHEALTHY}
+                        onClick={() => setAirQuality(AIR_LEVEL.VERY_UNHEALTHY)}
                         variant="red"
                       />
                       <OptionButton
                         icon={<Skull className="w-8 h-8" />}
                         label="Nguy hại"
                         description="200+ AQI"
-                        isSelected={airQuality === 'hazardous'}
-                        onClick={() => setAirQuality('hazardous')}
+                        isSelected={airQuality === AIR_LEVEL.HAZARDOUS}
+                        onClick={() => setAirQuality(AIR_LEVEL.HAZARDOUS)}
                         variant="purple"
                         className="col-span-2"
                       />
@@ -235,32 +236,32 @@ export function ReportModal({ isOpen, onClose, user, location, onReportCreated }
                       icon={<VolumeX className="w-8 h-8" />}
                       label="Yên tĩnh"
                       description="< 40 dB"
-                      isSelected={noiseLevel === 'quiet'}
-                      onClick={() => setNoiseLevel('quiet')}
+                      isSelected={noiseLevel === NOISE_LEVEL.QUITE}
+                      onClick={() => setNoiseLevel(NOISE_LEVEL.QUITE)}
                       variant="green"
                     />
                     <OptionButton
                       icon={<Volume2 className="w-8 h-8" />}
                       label="Trung bình"
                       description="40-60 dB"
-                      isSelected={noiseLevel === 'moderate'}
-                      onClick={() => setNoiseLevel('moderate')}
+                      isSelected={noiseLevel === NOISE_LEVEL.MODERATE}
+                      onClick={() => setNoiseLevel(NOISE_LEVEL.MODERATE)}
                       variant="yellow"
                     />
                     <OptionButton
                       icon={<Volume2 className="w-8 h-8" />}
                       label="Ồn"
                       description="60-80 dB"
-                      isSelected={noiseLevel === 'loud'}
-                      onClick={() => setNoiseLevel('loud')}
+                      isSelected={noiseLevel === NOISE_LEVEL.LOUND}
+                      onClick={() => setNoiseLevel(NOISE_LEVEL.LOUND)}
                       variant="orange"
                     />
                     <OptionButton
                       icon={<Volume2 className="w-8 h-8" />}
                       label="Rất ồn"
                       description="> 80 dB"
-                      isSelected={noiseLevel === 'very_loud'}
-                      onClick={() => setNoiseLevel('very_loud')}
+                      isSelected={noiseLevel === NOISE_LEVEL.VERY_LOUND}
+                      onClick={() => setNoiseLevel(NOISE_LEVEL.VERY_LOUND)}
                       variant="red"
                     />
                 </div>

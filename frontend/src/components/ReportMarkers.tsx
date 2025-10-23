@@ -1,5 +1,6 @@
 import { Smile, Frown, Skull, AlertTriangle, Volume2, VolumeX } from 'lucide-react';
-import type { Report } from '../App';
+import { AIR_LEVEL, NOISE_LEVEL, type Report } from '../App';
+
 
 type ReportMarkersProps = {
   reports: Report[];
@@ -8,54 +9,55 @@ type ReportMarkersProps = {
 };
 
 export function ReportMarkers({ reports, onMarkerClick, selectedReport }: ReportMarkersProps) {
-  const getAirIcon = (level?: string) => {
+
+  const getAirIcon = (level?: AIR_LEVEL) => {
     switch (level) {
-      case 'good':
+      case 1:
         return <Smile className="w-5 h-5 text-green-600" />;
-      case 'moderate':
+      case 2:
         return <Smile className="w-5 h-5 text-yellow-600" />;
-      case 'unhealthy':
+      case 3:
         return <Frown className="w-5 h-5 text-orange-600" />;
-      case 'very_unhealthy':
-        return <AlertTriangle className="w-5 h-5 text-red-600" />;
-      case 'hazardous':
+      case 4:
+        return <AlertTriangle className="w-5 h-5 text-red-600" />;  
+      case 5:
         return <Skull className="w-5 h-5 text-purple-600" />;
       default:
         return <Smile className="w-5 h-5 text-gray-600" />;
     }
   };
 
-  const getNoiseIcon = (level?: string) => {
+  const getNoiseIcon = (level?: NOISE_LEVEL) => {
     switch (level) {
-      case 'quiet':
+      case 1:
         return <VolumeX className="w-5 h-5 text-green-600" />;
-      case 'moderate':
+      case 2:
         return <Volume2 className="w-5 h-5 text-yellow-600" />;
-      case 'loud':
+      case 3:
         return <Volume2 className="w-5 h-5 text-orange-600" />;
-      case 'very_loud':
+      case 4:
         return <Volume2 className="w-5 h-5 text-red-600" />;
       default:
         return <Volume2 className="w-5 h-5 text-gray-600" />;
     }
   };
 
-  const getBgColor = (type: string, level?: string) => {
-    if (type === 'air') {
+  const getBgColor = (level?: AIR_LEVEL|NOISE_LEVEL) => {
+    if (typeof level === typeof AIR_LEVEL) {
       switch (level) {
-        case 'good': return 'bg-green-100 border-green-400';
-        case 'moderate': return 'bg-yellow-100 border-yellow-400';
-        case 'unhealthy': return 'bg-orange-100 border-orange-400';
-        case 'very_unhealthy': return 'bg-red-100 border-red-400';
-        case 'hazardous': return 'bg-purple-100 border-purple-400';
+        case 1: return 'bg-green-100 border-greentypeo';
+        case 2: return 'bg-yellow-100 border-yellow-400';
+        case 3: return 'bg-orange-100 border-orange-400';
+        case 4: return 'bg-red-100 border-red-400';
+        case 5: return 'bg-purple-100 border-purple-400';
         default: return 'bg-gray-100 border-gray-400';
       }
     } else {
       switch (level) {
-        case 'quiet': return 'bg-green-100 border-green-400';
-        case 'moderate': return 'bg-yellow-100 border-yellow-400';
-        case 'loud': return 'bg-orange-100 border-orange-400';
-        case 'very_loud': return 'bg-red-100 border-red-400';
+        case 1: return 'bg-green-100 border-green-400';
+        case 2: return 'bg-yellow-100 border-yellow-400';
+        case 3: return 'bg-orange-100 border-orange-400';
+        case 4: return 'bg-red-100 border-red-400';
         default: return 'bg-gray-100 border-gray-400';
       }
     }
@@ -66,7 +68,6 @@ export function ReportMarkers({ reports, onMarkerClick, selectedReport }: Report
       {reports.map((report) => {
         const isSelected = selectedReport?.id === report.id;
         const bgColor = getBgColor(
-          report.type,
           report.type === 'air' ? report.airQuality : report.noiseLevel
         );
 

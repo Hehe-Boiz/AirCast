@@ -6,6 +6,8 @@ import { StatCard } from './StatCard';
 import { Progress } from './ui/progress';
 import { SettingsModal } from './SettingsModal';
 import type { User } from '../App';
+import { usersService } from '../services';
+
 
 type SidebarProps = {
   user: User;
@@ -17,7 +19,7 @@ type SidebarProps = {
 
 export function Sidebar({ user, onLogout, onUserUpdate, isOpen, onToggle }: SidebarProps) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
+  const userStats = usersService.getUserStats()
   return (
     <>
       {/* Settings Modal */}
@@ -97,26 +99,26 @@ export function Sidebar({ user, onLogout, onUserUpdate, isOpen, onToggle }: Side
               <TrendingUp className="md:w-5 md:h-5 w-4 h-4 text-emerald-600" />
               Thống kê hoạt động
             </h3>
-            
             <div className="md:space-y-3 space-y-2">
+              {/* endpoint /users/stats */}
                <StatCard
                 title="Tổng báo cáo"
-                value="47 báo cáo"
-                subtitle="+3 tuần này"
+                value={""}
+                subtitle={""}
                 icon={<Target className="md:w-6 md:h-6 w-5 h-5 text-white" />}
                 variant="cyan"
               />
               <StatCard
                 title="Độ chính xác"
-                value="94%"
-                subtitle="Xuất sắc!"
+                value={""}
+                subtitle={""}
                 icon={<Award className="md:w-6 md:h-6 w-5 h-5 text-white" />}
                 variant="emerald"
               />
               <StatCard
                 title="Streak hiện tại"
-                value="12 ngày"
-                subtitle="Tiếp tục phát huy!"
+                value={""}
+                subtitle={""}
                 icon={<Flame className="md:w-6 md:h-6 w-5 h-5 text-white" />}
                 variant="orange"
               />
@@ -131,10 +133,10 @@ export function Sidebar({ user, onLogout, onUserUpdate, isOpen, onToggle }: Side
             <div className="grid grid-cols-3 md:gap-3 gap-2">
               {[
                 { emoji: '🏆', label: 'Người đi đầu', unlocked: true },
-                { emoji: '🎯', label: '50 báo cáo', unlocked: true },
-                { emoji: '⭐', label: 'Chính xác', unlocked: true },
-                { emoji: '🔥', label: '10 ngày', unlocked: true },
-                { emoji: '💎', label: 'Tinh hoa', unlocked: true },
+                { emoji: '🎯', label: '50 báo cáo', unlocked: false },
+                { emoji: '⭐', label: 'Chính xác', unlocked: false },
+                { emoji: '🔥', label: '10 ngày', unlocked: false },
+                { emoji: '💎', label: 'Tinh hoa', unlocked: false },
                 { emoji: '🌟', label: 'Siêu sao', unlocked: false },
               ].map((achievement, i) => (
                 <div
@@ -155,7 +157,10 @@ export function Sidebar({ user, onLogout, onUserUpdate, isOpen, onToggle }: Side
           <div className="md:pt-4 pt-3 border-t border-gray-200">
             <div className="flex items-center justify-between md:mb-3 mb-2">
               <span className="md:text-sm text-xs text-gray-600">Tiến trình lên cấp</span>
-              <span className="md:text-sm text-xs text-emerald-600">Cấp 8</span>
+              {/*const user =  user.getstats
+                user.get_level();
+              */}
+              <span className="md:text-sm text-xs text-emerald-600">Cấp {"user.get_level() +1"}</span> 
             </div>
             <div className="relative">
               <Progress value={user.reputation} className="md:h-3 h-2.5 bg-gray-200" />
@@ -164,8 +169,8 @@ export function Sidebar({ user, onLogout, onUserUpdate, isOpen, onToggle }: Side
               </div>
             </div>
             <div className="flex items-center justify-between md:mt-2 mt-1.5">
-              <span className="md:text-xs text-[10px] text-gray-500">Cấp 7</span>
-              <span className="md:text-xs text-[10px] text-gray-500">Cấp 9</span>
+              <span className="md:text-xs text-[10px] text-gray-500">Cấp {"user"}</span>
+              <span className="md:text-xs text-[10px] text-gray-500">Cấp {"user+1"}</span>
             </div>
           </div>
         </div>

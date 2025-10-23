@@ -1,5 +1,3 @@
-import { Leaf } from 'lucide-react';
-
 export function AuthBackground() {
   return (
     <>
