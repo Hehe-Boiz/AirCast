@@ -1,5 +1,4 @@
-// Reports Service
-// Xử lý tất cả API calls liên quan đến báo cáo môi trường
+// src/services/reports.ts
 
 import { apiService } from './api';
 import { API_CONFIG } from '../config/api';
@@ -11,40 +10,96 @@ import type {
   ReportsByLocationRequest,
   UploadImageResponse,
   UploadAudioResponse,
+  AIR_LEVEL,
+  NOISE_LEVEL
 } from '../types/api';
 import type { Report } from '../App';
-import { mockReports } from '../data/mockData';
+
+// ================= MOCK DATA =================
+// Một "cơ sở dữ liệu giả" trong bộ nhớ để lưu trữ các báo cáo khi ở chế độ mock
+const mockReports: Report[] = [
+    {
+      id: 'report_1',
+      userId: '1',
+      userName: 'Người dùng Demo',
+      userReputation: 85,
+      lat: 10.7769,
+      lng: 10.7009,
+      type: 'air',
+      airQuality: 2 as AIR_LEVEL,
+      timestamp: new Date('2024-05-20T10:30:00Z'),
+      comment: 'Không khí hôm nay khá dễ chịu.',
+      upvotes: 10,
+      downvotes: 1,
+    },
+    {
+      id: 'report_2',
+      userId: '2',
+      userName: 'Jane Doe',
+      userReputation: 95,
+      lat: 10.775,
+      lng: 10.705,
+      type: 'noise',
+      noiseLevel: 3 as NOISE_LEVEL,
+      timestamp: new Date('2024-05-20T11:00:00Z'),
+      comment: 'Công trường xây dựng đang làm việc rất ồn ào.',
+      imageUrl: 'https://via.placeholder.com/150',
+      upvotes: 25,
+      downvotes: 2,
+    },
+];
+// =============================================
 
 class ReportsService {
   // Create a new report
   async createReport(reportData: CreateReportRequest): Promise<CreateReportResponse> {
-    // MOCK MODE - Remove this block when connecting to Django
     if (API_CONFIG.USE_MOCK_DATA) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log("Creating report in MOCK mode:", reportData);
+      await new Promise(resolve => setTimeout(resolve, 800)); // Giả lập độ trễ mạng
+
+      // Tạo một report mới và thêm vào "cơ sở dữ liệu giả"
+      const newReport: Report = {
+        id: `report_${Date.now()}`,
+        userId: '1', // Giả sử là người dùng hiện tại
+        userName: 'Người dùng Demo',
+        userReputation: 85,
+        lat: reportData.lat,
+        lng: reportData.lng,
+        type: reportData.type,
+        airQuality: reportData.air_quality,
+        noiseLevel: reportData.noise_level,
+        comment: reportData.comment,
+        imageUrl: reportData.image ? URL.createObjectURL(reportData.image) : undefined,
+        audioUrl: reportData.audio ? URL.createObjectURL(reportData.audio) : undefined,
+        timestamp: new Date(),
+        upvotes: 0,
+        downvotes: 0,
+        userVote: null,
+      };
+
+      mockReports.push(newReport);
+      console.log("New report added to mock DB. Total reports:", mockReports.length);
       
       return {
-        id: `report_${Date.now()}`,
-        message: 'Báo cáo đã được tạo thành công',
+        id: newReport.id,
+        message: 'Báo cáo đã được tạo thành công (Mock)',
         reputation_gained: 5,
       };
     }
 
     // REAL API CALL
-    // Upload image nếu có
     let imageUrl: string | undefined;
     if (reportData.image) {
       const imageUploadResponse = await this.uploadImage(reportData.image);
       imageUrl = imageUploadResponse.url;
     }
 
-    // Upload audio nếu có
     let audioUrl: string | undefined;
     if (reportData.audio) {
       const audioUploadResponse = await this.uploadAudio(reportData.audio);
       audioUrl = audioUploadResponse.url;
     }
 
-    // Create report với URLs của uploaded files
     const payload = {
       type: reportData.type,
       lat: reportData.lat,
@@ -64,40 +119,24 @@ class ReportsService {
 
   // Get reports with filters
   async getReports(params: GetReportsRequest = {}): Promise<GetReportsResponse> {
-    // MOCK MODE
     if (API_CONFIG.USE_MOCK_DATA) {
-      await new Promise(resolve => setTimeout(resolve, 300));
+      console.log("Getting reports in MOCK mode.");
+      await new Promise(resolve => setTimeout(resolve, 500));
       
-      let filteredReports = [...mockReports];
-      
-      // Filter by location
-      if (params.lat && params.lng && params.radius) {
-        filteredReports = filteredReports.filter(report => {
-          const distance = this.calculateDistance(
-            params.lat!,
-            params.lng!,
-            report.lat,
-            report.lng
-          );
-          return distance <= params.radius!;
-        });
-      }
-      
-      // Filter by type
-      if (params.type) {
-        filteredReports = filteredReports.filter(r => r.type === params.type);
-      }
-      
-      // Apply pagination
-      const limit = params.limit || 20;
-      const offset = params.offset || 0;
-      const paginatedReports = filteredReports.slice(offset, offset + limit);
-      
+      // Lọc các báo cáo dựa trên vị trí (đơn giản)
+      const filteredReports = mockReports.filter(report => {
+        if (params.lat && params.lng && params.radius) {
+          const distance = this.calculateDistance(params.lat, params.lng, report.lat, report.lng);
+          return distance <= params.radius;
+        }
+        return true;
+      });
+
       return {
         count: filteredReports.length,
-        next: offset + limit < filteredReports.length ? 'next_url' : null,
-        previous: offset > 0 ? 'prev_url' : null,
-        results: paginatedReports,
+        next: null,
+        previous: null,
+        results: filteredReports,
       };
     }
 
@@ -120,14 +159,8 @@ class ReportsService {
     lng: number,
     radius: number = 1
   ): Promise<Report[]> {
-    // MOCK MODE
     if (API_CONFIG.USE_MOCK_DATA) {
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      return mockReports.filter(report => {
-        const distance = this.calculateDistance(lat, lng, report.lat, report.lng);
-        return distance <= radius;
-      });
+      return mockReports.filter(report => this.calculateDistance(lat, lng, report.lat, report.lng) <= radius);
     }
 
     // REAL API CALL
@@ -141,15 +174,12 @@ class ReportsService {
 
   // Get single report by ID
   async getReportById(id: string): Promise<Report> {
-    // MOCK MODE
     if (API_CONFIG.USE_MOCK_DATA) {
-      await new Promise(resolve => setTimeout(resolve, 200));
       const report = mockReports.find(r => r.id === id);
-      if (!report) throw new Error('Report not found');
-      return report;
+      if (report) return report;
+      throw new Error("Report not found");
     }
-
-    // REAL API CALL
+     // REAL API CALL
     return apiService.get<Report>(API_CONFIG.ENDPOINTS.REPORT_DETAIL(id));
   }
 
@@ -201,46 +231,15 @@ class ReportsService {
 
   // Vote on report (validate or dispute)
   async voteReport(reportId: string, voteType: 'up' | 'down'): Promise<{ success: boolean; upvotes: number; downvotes: number }> {
-    // MOCK MODE
     if (API_CONFIG.USE_MOCK_DATA) {
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
       const report = mockReports.find(r => r.id === reportId);
-      if (!report) throw new Error('Report not found');
-      
-      // Toggle vote
-      if (report.userVote === voteType) {
-        // Remove vote
-        if (voteType === 'up') {
-          report.upvotes--;
-        } else {
-          report.downvotes--;
-        }
-        report.userVote = null;
-      } else {
-        // Remove previous vote if exists
-        if (report.userVote === 'up') {
-          report.upvotes--;
-        } else if (report.userVote === 'down') {
-          report.downvotes--;
-        }
-        
-        // Add new vote
-        if (voteType === 'up') {
-          report.upvotes++;
-        } else {
-          report.downvotes++;
-        }
-        report.userVote = voteType;
+      if (report) {
+        if (voteType === 'up') report.upvotes++;
+        else report.downvotes++;
+        return { success: true, upvotes: report.upvotes, downvotes: report.downvotes };
       }
-      
-      return {
-        success: true,
-        upvotes: report.upvotes,
-        downvotes: report.downvotes,
-      };
+      throw new Error("Report not found");
     }
-
     // REAL API CALL
     return apiService.post<{ success: boolean; upvotes: number; downvotes: number }>(
       `/api/reports/${reportId}/vote/`,

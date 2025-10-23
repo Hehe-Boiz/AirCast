@@ -1,10 +1,24 @@
 // API Request & Response Types
 // Tương ứng với Django serializers
 
-import type { User, Report, AirQualityLevel, NoiseLevel } from '../App';
+import type { User, Report} from '../App';
 
 // ==================== Authentication ====================
 
+export enum AIR_LEVEL {
+  GOOD = 1,
+  MODERATE,
+  UNHEALTHY,
+  VERY_UNHEALTHY,
+  HAZARDOUS
+}
+
+export enum NOISE_LEVEL {
+  QUITE = 1,
+  MODERATE,
+  LOUND,
+  VERY_LOUND
+}
 export interface LoginRequest {
   email: string;
   password: string;
@@ -37,8 +51,8 @@ export interface CreateReportRequest {
   type: 'air' | 'noise';
   lat: number;
   lng: number;
-  air_quality?: AirQualityLevel;
-  noise_level?: NoiseLevel;
+  air_quality?: AIR_LEVEL;
+  noise_level?: NOISE_LEVEL;
   comment?: string;
   image?: File;
   audio?: File;

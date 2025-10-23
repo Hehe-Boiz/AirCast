@@ -9,7 +9,8 @@ import type { Report } from '../App';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { reportsService } from '../services';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
+import { AIR_LEVEL, NOISE_LEVEL } from '../types/api';
 
 type LocationInfoProps = {
   location: { lat: number; lng: number };
@@ -94,32 +95,32 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
       setVotingReport(null);
     }
   };
-  const getAQILevel = (level?: string): { value: number; label: string; color: string; gradient: string } => {
+  const getAQILevel = (level?: AIR_LEVEL): { value: number; label: string; color: string; gradient: string } => {
     switch (level) {
-      case 'good':
+      case AIR_LEVEL.GOOD:
         return { value: 30, label: 'Tốt', color: 'bg-green-500', gradient: 'from-green-500 to-emerald-600' };
-      case 'moderate':
+      case AIR_LEVEL.MODERATE:
         return { value: 75, label: 'Trung bình', color: 'bg-yellow-500', gradient: 'from-yellow-500 to-orange-500' };
-      case 'unhealthy':
+      case AIR_LEVEL.UNHEALTHY:
         return { value: 125, label: 'Kém', color: 'bg-orange-500', gradient: 'from-orange-500 to-red-500' };
-      case 'very_unhealthy':
+      case AIR_LEVEL.VERY_UNHEALTHY:
         return { value: 175, label: 'Xấu', color: 'bg-red-500', gradient: 'from-red-500 to-rose-600' };
-      case 'hazardous':
+      case AIR_LEVEL.HAZARDOUS:
         return { value: 225, label: 'Nguy hại', color: 'bg-purple-500', gradient: 'from-purple-500 to-pink-600' };
       default:
         return { value: 50, label: 'Trung bình', color: 'bg-gray-500', gradient: 'from-gray-500 to-gray-600' };
     }
   };
 
-  const getNoiseLevel = (level?: string): { value: number; label: string } => {
+  const getNoiseLevel = (level?: NOISE_LEVEL): { value: number; label: string } => {
     switch (level) {
-      case 'quiet':
+      case NOISE_LEVEL.QUITE:
         return { value: 40, label: 'Yên tĩnh' };
-      case 'moderate':
+      case NOISE_LEVEL.MODERATE:
         return { value: 60, label: 'Trung bình' };
-      case 'loud':
+      case NOISE_LEVEL.LOUND:
         return { value: 80, label: 'Ồn' };
-      case 'very_loud':
+      case NOISE_LEVEL.VERY_LOUND:
         return { value: 100, label: 'Rất ồn' };
       default:
         return { value: 50, label: 'Trung bình' };
@@ -145,7 +146,7 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
   return (
     <div className="absolute top-0 left-0 w-full md:w-[450px] h-full bg-white shadow-2xl z-40 flex flex-col overflow-hidden">
       {/* Header with gradient background */}
-      <div className={`bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 text-white relative overflow-hidden flex-shrink-0 transition-shadow duration-300 ${
+      <div className={`bg-linear-to-br from-emerald-500 via-teal-500 to-cyan-500 text-white relative overflow-hidden shrink-0 transition-shadow duration-300 ${
         isScrolled ? 'shadow-lg' : ''
       }`}>
         {/* Background decoration */}
@@ -241,7 +242,7 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
                       {/* User Info */}
                       <div className="flex items-center md:gap-3 gap-2 md:mb-3 mb-2">
                         <Avatar className="md:w-10 md:h-10 w-8 h-8 md:border-2 border border-gray-200">
-                          <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white md:text-base text-xs">
+                          <AvatarFallback className="bg-linear-to-br from-emerald-500 to-teal-600 text-white md:text-base text-xs">
                             {report.userName.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
@@ -268,7 +269,7 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
                       {/* Report Content */}
                       {report.type === 'air' && report.airQuality && aqiData && (
                         <div className="md:mb-3 mb-2">
-                          <div className={`inline-flex items-center md:gap-2 gap-1.5 md:px-3 px-2 md:py-2 py-1.5 md:rounded-lg rounded-md bg-gradient-to-r ${aqiData.gradient}`}>
+                          <div className={`inline-flex items-center md:gap-2 gap-1.5 md:px-3 px-2 md:py-2 py-1.5 md:rounded-lg rounded-md bg-linear-to-r ${aqiData.gradient}`}>
                             <span className="md:text-sm text-xs text-white">🌫️ Không khí: {aqiData.label}</span>
                             <span className="md:text-xs text-[10px] text-white/90">({aqiData.value} AQI)</span>
                           </div>
@@ -285,9 +286,9 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
                       )}
 
                       {report.comment && (
-                        <div className="md:mb-3 mb-2 md:p-3 p-2 bg-gradient-to-br from-gray-50 to-gray-100 md:rounded-lg rounded-md border border-gray-200">
+                        <div className="md:mb-3 mb-2 md:p-3 p-2 bg-linear-to-br from-gray-50 to-gray-100 md:rounded-lg rounded-md border border-gray-200">
                           <div className="flex items-start md:gap-2 gap-1.5">
-                            <MessageSquare className="md:w-4 md:h-4 w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
+                            <MessageSquare className="md:w-4 md:h-4 w-3.5 h-3.5 text-gray-400 mt-0.5 shrink-0" />
                             <p className="md:text-sm text-xs text-gray-700 leading-relaxed">{report.comment}</p>
                           </div>
                         </div>
@@ -305,7 +306,7 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
                       )}
 
                       {report.audioUrl && (
-                        <div className="md:mb-3 mb-2 md:p-3 p-2 bg-gradient-to-br from-blue-50 to-cyan-50 md:rounded-lg rounded-md border border-blue-200">
+                        <div className="md:mb-3 mb-2 md:p-3 p-2 bg-linear-to-br from-blue-50 to-cyan-50 md:rounded-lg rounded-md border border-blue-200">
                           <div className="flex items-center md:gap-3 gap-2">
                             <div className="bg-blue-100 md:p-2 p-1.5 md:rounded-lg rounded-md">
                               <Volume2 className="md:w-4 md:h-4 w-3.5 h-3.5 text-blue-600" />
@@ -357,7 +358,7 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
                           <div className="flex items-center md:gap-1.5 gap-1">
                             <div className="md:h-1.5 h-1 md:w-16 w-12 bg-gray-200 rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 transition-all duration-300"
+                                className="h-full bg-linear-to-r from-emerald-500 to-emerald-600 transition-all duration-300"
                                 style={{
                                   width: `${(report.upvotes / (report.upvotes + report.downvotes)) * 100}%`,
                                 }}
@@ -380,7 +381,7 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
         
         {/* Scroll Indicator - Bottom */}
         {showScrollIndicator && !showBackToTop && (
-          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none flex items-end justify-center pb-3">
+          <div className="absolute bottom-0 left-0 right-0 h-16 bg-linear-to-t from-white via-white/80 to-transparent pointer-events-none flex items-end justify-center pb-3">
             <div className="animate-bounce">
               <svg
                 className="md:w-6 md:h-6 w-5 h-5 text-emerald-500"
@@ -403,7 +404,7 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
             <Button
               onClick={scrollToTop}
               size="icon"
-              className="md:w-12 md:h-12 w-10 h-10 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+              className="md:w-12 md:h-12 w-10 h-10 rounded-full bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
             >
               <ChevronUp className="md:w-5 md:h-5 w-4 h-4" />
             </Button>

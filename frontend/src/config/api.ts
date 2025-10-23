@@ -38,7 +38,7 @@ export const API_CONFIG = {
   TIMEOUT: 30000,
   
   // Mock mode - set to false khi kết nối với Django
-  USE_MOCK_DATA: true,
+  USE_MOCK_DATA: false,
 };
 
 // Headers configuration

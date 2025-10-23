@@ -61,11 +61,11 @@ export function LoginScreen({ onLogin, onSwitchToRegister, onContinueAsGuest }: 
           </motion.div>
           
           <h1 className="text-white mb-4 drop-shadow-2xl" style={{ fontSize: '3.5rem', fontWeight: 800, lineHeight: 1.2, letterSpacing: '-0.02em' }}>
-            <span className="inline-block bg-gradient-to-r from-white via-emerald-50 to-white bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(255,255,255,0.5)]">
+            <span className="inline-block bg-linear-to-r from-white via-emerald-50 to-white bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(255,255,255,0.5)]">
               Cùng Nhau Tạo Nên
             </span>
             <br />
-            <span className="inline-block bg-gradient-to-r from-white via-cyan-50 to-white bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(255,255,255,0.5)]">
+            <span className="inline-block bg-linear-to-r from-white via-cyan-50 to-white bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(255,255,255,0.5)]">
               Thành Phố Xanh
             </span>
           </h1>
@@ -109,13 +109,13 @@ export function LoginScreen({ onLogin, onSwitchToRegister, onContinueAsGuest }: 
         <Card className="p-8 md:p-10 shadow-2xl border-0 bg-white/95 backdrop-blur-xl">
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 p-4 rounded-2xl shadow-lg transform hover:scale-110 transition-transform">
+              <div className="bg-linear-to-br from-emerald-500 to-emerald-600 p-4 rounded-2xl shadow-lg transform hover:scale-110 transition-transform">
                 <Leaf className="w-7 h-7 text-white" />
               </div>
-              <div className="bg-gradient-to-br from-teal-500 to-teal-600 p-4 rounded-2xl shadow-lg transform hover:scale-110 transition-transform" style={{ animationDelay: '0.1s' }}>
+              <div className="bg-linear-to-br from-teal-500 to-teal-600 p-4 rounded-2xl shadow-lg transform hover:scale-110 transition-transform" style={{ animationDelay: '0.1s' }}>
                 <Wind className="w-7 h-7 text-white" />
               </div>
-              <div className="bg-gradient-to-br from-cyan-500 to-cyan-600 p-4 rounded-2xl shadow-lg transform hover:scale-110 transition-transform" style={{ animationDelay: '0.2s' }}>
+              <div className="bg-linear-to-br from-cyan-500 to-cyan-600 p-4 rounded-2xl shadow-lg transform hover:scale-110 transition-transform" style={{ animationDelay: '0.2s' }}>
                 <Volume2 className="w-7 h-7 text-white" />
               </div>
             </div>
@@ -150,7 +150,7 @@ export function LoginScreen({ onLogin, onSwitchToRegister, onContinueAsGuest }: 
               />
             </div>
 
-            <Button type="submit" className="w-full h-12 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all" disabled={isLoading}>
+            <Button type="submit" className="w-full h-12 bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all" disabled={isLoading}>
               <span className="text-white">{isLoading ? 'Đang đăng nhập...' : 'Đăng nhập ngay'}</span>
             </Button>
 

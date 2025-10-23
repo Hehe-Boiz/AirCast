@@ -235,3 +235,24 @@ html {
     }
   }
 }
+.report-marker {
+  font-size: 24px;
+  text-align: center;
+  line-height: 32px;
+  transition: all 0.2s ease-in-out;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(2px);
+  width: 32px;
+  height: 32px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.report-marker.selected {
+  transform: scale(1.5);
+  box-shadow: 0 0 0 4px #3b82f6;
+}
+
+.report-marker:hover {
+  transform: scale(1.2);
+}

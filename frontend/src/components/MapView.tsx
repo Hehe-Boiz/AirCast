@@ -1,21 +1,20 @@
 // src/components/MapView.tsx
-import { useState, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import { useState, useEffect } from 'react';
+
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Button } from './ui/button';
-import { Plus, Navigation, Menu, X, MapPin, Layers, Filter, Wind, Volume2 } from 'lucide-react'; // Thêm icon
-import { LeafletHeatmapLayer } from './LeafletHeatmapLayer'; // Import component heatmap mới
-// import { ReportMarkers } from './ReportMarkers'; // Giữ lại nếu bạn muốn dùng lại Marker (cần điều chỉnh)
+import { Plus, Navigation, Menu, X, MapPin, Layers, Filter, Wind, Volume2 } from 'lucide-react';
+import { LeafletHeatmapLayer } from './LeafletHeatmapLayer';
+import { ReportMarkers } from './ReportMarkers'; // Import ReportMarkers
 import { LocationInfo } from './LocationInfo';
 import { Badge } from './ui/badge';
-import { type User, type Report, AIR_LEVEL } from '../App';
+import { type User, type Report } from '../App';
 import { reportsService } from '../services';
-import {InfoCard} from './InfoCard'
+import {InfoCard} from './InfoCard';
+import { AIR_LEVEL, NOISE_LEVEL } from '../types/api';
+import { toast } from 'sonner';
 
-// Import CSS của Leaflet
-import 'leaflet/dist/leaflet.css';
-
-// Props cho MapView (giữ nguyên)
 type MapViewProps = {
   user: User | null;
   onReportClick: () => void;
@@ -25,6 +24,7 @@ type MapViewProps = {
   onSidebarToggle: () => void;
   onShowLoginPrompt?: () => void;
 };
+// ... (giữ nguyên phần code đã có)
 
 // --- Component con để xử lý sự kiện click trên bản đồ ---
 function MapClickHandler({ onClick }: { onClick: (latlng: L.LatLng) => void }) {
@@ -78,7 +78,14 @@ function LocationMarkers({ userLocation, selectedLocation }: {
   );
 }
 
+function MapController({ center }: { center: L.LatLngExpression }) {
+  const map = useMap();
+  useEffect(() => {
+    map.flyTo(center, map.getZoom()); // Di chuyển mượt mà đến vị trí mới
+  }, [center, map]); // Chạy lại khi center thay đổi
 
+  return null;
+}
 export function MapView({
     user,
     onReportClick,
@@ -113,25 +120,26 @@ export function MapView({
   };
 
   // Lấy vị trí người dùng
-  const handleLocateMe = () => {
+const handleLocateMe = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setUserLocation([position.coords.latitude, position.coords.longitude]);
-          console.warn("Vị trí hiện tại của người dùng")
-          console.log(position.coords.latitude, position.coords.longitude);
+          const newLocation: L.LatLngExpression = [position.coords.latitude, position.coords.longitude];
+          setUserLocation(newLocation);
+          toast.success("Đã tìm thấy vị trí của bạn!");
         },
         () => {
-          console.warn("Không thể lấy vị trí người dùng, sử dụng vị trí mặc định.");
-          setUserLocation([10.7769, 106.7009]);
-          console.log(10.7769, 106.7009);
+           console.warn("Không thể lấy vị trí người dùng, sử dụng vị trí mặc định.");
+           setUserLocation([10.7769, 106.7009]);
+           toast.error("Không thể lấy vị trí của bạn.");
         },
         { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
       );
     } else {
        console.warn("Trình duyệt không hỗ trợ Geolocation.");
+       toast.warning("Trình duyệt của bạn không hỗ trợ định vị.");
     }
-  };
+  }; 
 
   // Load báo cáo từ API
   const loadReports = async () => {
@@ -145,9 +153,10 @@ export function MapView({
         limit: 200, // Tăng giới hạn để có nhiều điểm cho heatmap
       });
       setReports(response.results);
+      
     } catch (error) {
       console.error('Failed to load reports:', error);
-      // toast.error("Không thể tải danh sách báo cáo");
+      toast.error("Không thể tải danh sách báo cáo");
     } finally {
       setIsLoadingReports(false);
     }
@@ -163,12 +172,13 @@ export function MapView({
   const initialCenter: L.LatLngExpression = [10.7769, 106.7009];
 
   // Tính toán chất lượng không khí trung bình cho khu vực hiện tại (ví dụ)
-  const nearbyReports = reports.filter(r =>
-      Array.isArray(userLocation) &&
-      r.type === 'air' &&
-      Math.abs(r.lat - userLocation[0]) < 0.01 && // Điều chỉnh ngưỡng nếu cần
-      Math.abs(r.lng - userLocation[1]) < 0.01
-  );
+
+  const nearbyReports = (reports ?? []).filter(r => // <--- THÊM ?? [] Ở ĐÂY
+    Array.isArray(userLocation) &&
+    r.type === 'air' &&
+    Math.abs(r.lat - userLocation[0]) < 0.01 && 
+    Math.abs(r.lng - userLocation[1]) < 0.01
+);
   const avgNearbyAQI = nearbyReports.length > 0
     ? nearbyReports.reduce((sum, r) => sum + (r.airQuality === AIR_LEVEL.GOOD ? 1 : r.airQuality === AIR_LEVEL.MODERATE ? 2 : 3), 0) / nearbyReports.length
     : 1; // Giả sử là tốt nếu không có báo cáo
@@ -185,6 +195,7 @@ export function MapView({
         style={{ height: '100%', width: '100%', zIndex: 10 }}
         className="map-container" // Thêm class để có thể style dễ hơn
       >
+        <MapController center={userLocation} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -202,18 +213,11 @@ export function MapView({
         {/* Markers cho vị trí người dùng và vị trí được chọn */}
         <LocationMarkers userLocation={userLocation} selectedLocation={selectedLocation ? [selectedLocation.lat, selectedLocation.lng] : null}/>
 
+        {/* Thêm ReportMarkers */}
+        {showMarkers && <ReportMarkers reports={reports} onMarkerClick={handleReportMarkerClick} selectedReport={selectedReport} />}
+
         {/* Component xử lý click */}
         <MapClickHandler onClick={handleMapClickInternal} />
-
-        {/* Nếu muốn dùng lại ReportMarkers, cần điều chỉnh nó để dùng <Marker> */}
-        {/* {showMarkers && reports.length > 0 && (
-          <ReportMarkers
-             reports={reports}
-             onMarkerClick={handleReportMarkerClick}
-             selectedReport={selectedReport}
-           />
-         )} */}
-
       </MapContainer>
 
       {/* --- UI Controls --- */}
@@ -253,7 +257,7 @@ export function MapView({
           <Button
             onClick={() => onShowLoginPrompt?.()}
             size="sm"
-            className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg rounded-xl md:px-5 px-4 md:h-11 h-10 border-0"
+            className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg rounded-xl md:px-5 px-4 md:h-11 h-10 border-0"
           >
             <span className="text-white md:text-sm text-xs">Đăng nhập / Đăng ký</span>
           </Button>
@@ -269,7 +273,7 @@ export function MapView({
             size="lg"
             className={`md:rounded-xl rounded-lg md:h-12 h-10 md:px-3 px-2.5 shadow-sm transition-all ${
               showHeatmap
-                ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-600 hover:to-teal-700 border-0'
+                ? 'bg-linear-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-600 hover:to-teal-700 border-0'
                 : 'bg-white text-gray-500 hover:bg-gray-50  border-gray-200'
             }`}
             variant={showHeatmap ? "default" : "outline"}
@@ -285,7 +289,7 @@ export function MapView({
             size="lg"
             className={`md:rounded-xl rounded-lg md:h-12 h-10 md:px-3 px-2.5 shadow-sm transition-all ${
               showMarkers
-                ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-600 hover:to-teal-700 border-0'
+                ? 'bg-linear-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-600 hover:to-teal-700 border-0'
                 : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-200'
             }`}
             variant={showMarkers ? "default" : "outline"}
@@ -314,14 +318,14 @@ export function MapView({
               onShowLoginPrompt();
             } else {
               if (!selectedLocation) {
-                //  toast.info("Vui lòng chọn một vị trí trên bản đồ trước khi báo cáo.");
+                  toast.info("Vui lòng chọn một vị trí trên bản đồ trước khi báo cáo.");
                  return;
               }
               onReportClick();
             }
           }}
           size="lg"
-          className="md:rounded-2xl rounded-xl md:w-14 md:h-14 w-12 h-12 shadow-xl bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 border-0 shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all hover:scale-105"
+          className="md:rounded-2xl rounded-xl md:w-14 md:h-14 w-12 h-12 shadow-xl bg-linear-to-br from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 border-0 shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all hover:scale-105"
           title="Tạo báo cáo mới tại vị trí đã chọn"
           // disabled={!selectedLocation && user} // Disable nếu đã login mà chưa chọn vị trí
         >
@@ -330,19 +334,16 @@ export function MapView({
       </div>
 
       {/* Location Info Panel */}
+      
       {showLocationInfo && selectedLocation && (
         <LocationInfo
           location={selectedLocation}
-          reports={reports.filter( // Lọc chính xác hơn cho LocationInfo
+          reports={(reports ?? []).filter( 
             r => r.lat === selectedLocation.lat && r.lng === selectedLocation.lng
           )}
-          selectedReport={selectedReport} // Truyền selectedReport nếu có
-          onClose={() => {
-            setShowLocationInfo(false);
-            setSelectedReport(null);
-            onLocationSelect(null); // Bỏ chọn vị trí khi đóng panel
-          }}
-          onReportUpdate={loadReports} // Cho phép LocationInfo trigger reload
+          selectedReport={selectedReport}
+          onClose={() => { /* ... */ }}
+          onReportUpdate={loadReports}
           onShowLoginPrompt={!user ? onShowLoginPrompt : undefined}
         />
       )}
@@ -350,7 +351,7 @@ export function MapView({
       {/* Enhanced Legend */}
        <div className={`absolute top-4 right-4 bg-white/95 backdrop-blur-2xl rounded-2xl shadow-lg shadow-gray-900/5 z-20 border border-gray-200/60 md:w-64 w-auto max-w-[calc(100vw-3rem)] overflow-hidden transition-all duration-300 ${isLegendExpanded ? 'h-auto' : 'md:h-auto h-[58px]'}`}>
          {/* Subtle gradient overlay */}
-         <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/30 via-transparent to-teal-50/20 pointer-events-none"></div>
+         <div className="absolute inset-0 bg-linear-to-br from-emerald-50/30 via-transparent to-teal-50/20 pointer-events-none"></div>
 
          <div className="relative md:p-4 p-2">
            {/* Header */}
@@ -359,7 +360,7 @@ export function MapView({
              className="flex items-center justify-between w-full md:mb-3.5 mb-0 md:pb-3 md:border-b border-gray-200/60 p-1 md:p-0 rounded-lg md:rounded-none hover:bg-gray-50/80 md:hover:bg-transparent transition-colors md:cursor-default cursor-pointer"
            >
              <div className="flex items-center gap-2">
-                <div className="w-9 h-9 md:w-9 md:h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md shadow-emerald-500/25 shrink-0">
+                <div className="w-9 h-9 md:w-9 md:h-9 rounded-xl bg-linear-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md shadow-emerald-500/25 shrink-0">
                   <Filter className="w-4 h-4 text-white" />
                 </div>
                <div className="text-left">
@@ -376,7 +377,7 @@ export function MapView({
            </button>
 
             {/* Legend Items (Conditional rendering based on expanded state) */}
-           <div className={`space-y-1.5 transition-all duration-300 overflow-hidden ${isLegendExpanded ? 'mt-2.5 max-h-96 opacity-100' : 'max-h-0 opacity-0 md:max-h-96 md:opacity-100 md:mt-0'}`}>
+           <div className={`space-y-1.5 transition-all duration-300 overflow-hidden ${isLegendExpanded ? 'mt-2.5 max-h-96 opacity-100' : 'max-h-0 opacity-0 md:max-h-100 md:opacity-100 md:mt-0'}`}>
               <InfoCard value="0-50" label="Tốt" icon="😊" variant="green" />
               <InfoCard value="51-100" label="Trung bình" icon="😐" variant="yellow" />
               <InfoCard value="101-150" label="Kém" icon="😷" variant="orange" />

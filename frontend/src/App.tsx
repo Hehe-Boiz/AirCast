@@ -9,6 +9,8 @@ import { Sidebar } from './components/Sidebar';
 import { LoginPromptModal } from './components/LoginPromptModal';
 import { Toaster } from './components/ui/sonner';
 import { authService } from './services';
+import { AIR_LEVEL, NOISE_LEVEL } from './types/api';
+
 
 export type User = {
   id: string;
@@ -18,19 +20,7 @@ export type User = {
   avatar?: string; // URL to avatar image
 };
 
-export  enum AIR_LEVEL{
-    GOOD = 1,
-    MODERATE,
-    UNHEALTHY,
-    VERY_UNHEALTHY,
-    HAZARDOUS
-  }
-export  enum NOISE_LEVEL{
-    QUITE=1,
-    MODERATE,
-    LOUND,
-    VERY_LOUND
-  }
+
 export type Report = {
   id: string;
   userId: string;

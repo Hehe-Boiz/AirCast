@@ -50,14 +50,14 @@ export function LoginPromptModal({ isOpen, onClose, onLogin, onRegister, action 
           </Button>
           <Button
             onClick={onRegister}
-            className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 order-2"
+            className="w-full sm:w-auto bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 order-2"
           >
             <UserPlus className="w-4 h-4 mr-2" />
             Đăng ký
           </Button>
           <Button
             onClick={onLogin}
-            className="w-full sm:w-auto bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 order-1 sm:order-3"
+            className="w-full sm:w-auto bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 order-1 sm:order-3"
           >
             <LogIn className="w-4 h-4 mr-2" />
             Đăng nhập

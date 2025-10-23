@@ -12,9 +12,10 @@ import { Textarea } from './ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Upload, Mic, Smile, Frown, AlertTriangle, Skull, Volume2, VolumeX, Send, Camera, Image as ImageIcon, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { AIR_LEVEL, NOISE_LEVEL, type User} from '../App';
+import { type User} from '../App';
 import { reportsService } from '../services';
 import { OptionButton } from './OptionButton';
+import { AIR_LEVEL, NOISE_LEVEL } from '../types/api';
 
 
 type ReportModalProps = {
@@ -114,7 +115,7 @@ export function ReportModal({ isOpen, onClose, user, location, onReportCreated }
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl p-0 gap-0 flex flex-col">
         {/* Header */}
-        <DialogHeader className="p-6 pb-4 bg-gradient-to-br from-emerald-50 to-teal-50 border-b flex-shrink-0">
+        <DialogHeader className="p-6 pb-4 bg-linear-to-br from-emerald-50 to-teal-50 border-b shrink-0">
           <DialogTitle className="text-2xl text-gray-900">Báo cáo tình trạng môi trường</DialogTitle>
           <DialogDescription className="text-gray-600">
             {location
@@ -185,7 +186,7 @@ export function ReportModal({ isOpen, onClose, user, location, onReportCreated }
               <div className="space-y-3">
                 <Label htmlFor="image-upload" className="text-base">Thêm ảnh minh chứng (tùy chọn)</Label>
                 {image ? (
-                  <div className="relative bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-dashed border-green-300 rounded-xl p-4">
+                  <div className="relative bg-linear-to-br from-green-50 to-emerald-50 border-2 border-dashed border-green-300 rounded-xl p-4">
                     <div className="flex items-center gap-3">
                       <div className="bg-green-100 p-3 rounded-lg">
                         <ImageIcon className="w-6 h-6 text-green-600" />
@@ -270,7 +271,7 @@ export function ReportModal({ isOpen, onClose, user, location, onReportCreated }
               <div className="space-y-3">
                 <Label className="text-base">Ghi âm mẫu (tùy chọn)</Label>
                 {audio ? (
-                  <div className="bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-cyan-300 rounded-xl p-4">
+                  <div className="bg-linear-to-br from-blue-50 to-cyan-50 border-2 border-cyan-300 rounded-xl p-4">
                     <div className="flex items-center gap-3">
                       <div className="bg-cyan-100 p-3 rounded-lg">
                         <Mic className="w-6 h-6 text-cyan-600" />
@@ -296,7 +297,7 @@ export function ReportModal({ isOpen, onClose, user, location, onReportCreated }
                     variant={isRecording ? 'destructive' : 'outline'}
                     className={`w-full h-24 rounded-xl transition-all ${
                       isRecording 
-                        ? 'bg-gradient-to-br from-red-500 to-red-600 animate-pulse' 
+                        ? 'bg-linear-to-br from-red-500 to-red-600 animate-pulse' 
                         : 'border-2 border-dashed hover:border-cyan-400 hover:bg-cyan-50'
                     }`}
                     onClick={handleRecording}
@@ -315,7 +316,7 @@ export function ReportModal({ isOpen, onClose, user, location, onReportCreated }
               <div className="space-y-3">
                 <Label htmlFor="noise-image-upload" className="text-base">Chụp nguyên nhân gây ồn (tùy chọn)</Label>
                 {image ? (
-                  <div className="relative bg-gradient-to-br from-orange-50 to-red-50 border-2 border-dashed border-orange-300 rounded-xl p-4">
+                  <div className="relative bg-linear-to-br from-orange-50 to-red-50 border-2 border-dashed border-orange-300 rounded-xl p-4">
                     <div className="flex items-center gap-3">
                       <div className="bg-orange-100 p-3 rounded-lg">
                         <ImageIcon className="w-6 h-6 text-orange-600" />
@@ -374,11 +375,11 @@ export function ReportModal({ isOpen, onClose, user, location, onReportCreated }
         </div>
 
         {/* Footer */}
-        <div className="flex gap-3 p-6 border-t bg-gray-50 flex-shrink-0">
+        <div className="flex gap-3 p-6 border-t bg-gray-50 shrink-0">
           <Button variant="outline" onClick={onClose} className="flex-1 h-12 rounded-xl" disabled={isSubmitting}>
             Hủy
           </Button>
-          <Button onClick={handleSubmit} className="flex-1 h-12 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-xl shadow-lg shadow-emerald-500/30" disabled={isSubmitting}>
+          <Button onClick={handleSubmit} className="flex-1 h-12 bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-xl shadow-lg shadow-emerald-500/30" disabled={isSubmitting}>
             <Send className="w-4 h-4 mr-2" />
             {isSubmitting ? 'Đang gửi...' : 'Gửi báo cáo'}
           </Button>

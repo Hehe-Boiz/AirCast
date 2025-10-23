@@ -155,7 +155,7 @@ export function SettingsModal({ isOpen, onClose, user, onSave }: SettingsModalPr
       <DialogContent className="md:max-w-2xl max-w-[95vw] md:max-h-[90vh] max-h-[95vh] overflow-y-auto md:p-6 p-4">
         <DialogHeader>
           <DialogTitle className="flex items-center md:gap-3 gap-2 md:text-2xl text-lg">
-            <div className="md:p-3 p-2 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl">
+            <div className="md:p-3 p-2 bg-linear-to-br from-emerald-400 to-teal-500 rounded-xl">
               <UserCircle className="md:w-6 md:h-6 w-5 h-5 text-white" />
             </div>
             Chỉnh sửa thông tin cá nhân
@@ -167,11 +167,11 @@ export function SettingsModal({ isOpen, onClose, user, onSave }: SettingsModalPr
 
         <div className="md:space-y-6 space-y-4 md:mt-6 mt-4">
           {/* Profile Picture Section */}
-          <div className="flex flex-col items-center md:gap-4 gap-3 md:p-6 p-4 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-200">
+          <div className="flex flex-col items-center md:gap-4 gap-3 md:p-6 p-4 bg-linear-to-br from-gray-50 to-white rounded-2xl border border-gray-200">
             <div className="relative group">
               <Avatar className="md:w-24 md:h-24 w-20 h-20 border-4 border-emerald-200 shadow-lg">
                 {avatar && <AvatarImage src={avatar} alt={name} />}
-                <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white md:text-3xl text-2xl">
+                <AvatarFallback className="bg-linear-to-br from-emerald-500 to-teal-600 text-white md:text-3xl text-2xl">
                   {name.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -185,7 +185,7 @@ export function SettingsModal({ isOpen, onClose, user, onSave }: SettingsModalPr
               />
               <label
                 htmlFor="avatar-upload"
-                className="absolute bottom-0 right-0 md:p-2.5 p-2 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full border-4 border-white shadow-lg opacity-0 group-hover:opacity-100 transition-all cursor-pointer hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="absolute bottom-0 right-0 md:p-2.5 p-2 bg-linear-to-br from-emerald-400 to-teal-500 rounded-full border-4 border-white shadow-lg opacity-0 group-hover:opacity-100 transition-all cursor-pointer hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isUploadingAvatar ? (
                   <div className="md:w-4 md:h-4 w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -306,7 +306,7 @@ export function SettingsModal({ isOpen, onClose, user, onSave }: SettingsModalPr
             </Button>
             <Button
               onClick={handleSave}
-              className="flex-1 md:h-11 h-9 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 md:text-base text-sm"
+              className="flex-1 md:h-11 h-9 bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 md:text-base text-sm"
               disabled={isSaving}
             >
               <Save className="md:w-4 md:h-4 w-3.5 h-3.5 md:mr-2 mr-1.5" />

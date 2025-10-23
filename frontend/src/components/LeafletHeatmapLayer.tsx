@@ -3,7 +3,8 @@ import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.heat'; // Import plugin leaflet.heat
-import { Report, AIR_LEVEL, NOISE_LEVEL } from '../App'; // Import kiểu dữ liệu
+import { Report} from '../App'; // Import kiểu dữ liệu
+import { AIR_LEVEL, NOISE_LEVEL } from '../types/api';
 
 // Hàm tính cường độ (intensity) dựa trên chất lượng không khí
 const getAirIntensity = (level?: AIR_LEVEL): number => {
@@ -36,7 +37,7 @@ type LeafletHeatmapLayerProps = {
 
 export function LeafletHeatmapLayer({ reports, reportType, options }: LeafletHeatmapLayerProps) {
   const map = useMap(); // Lấy đối tượng map từ react-leaflet
-
+  if(reports){
   useEffect(() => {
     if (!map || reports.length === 0) return;
 
@@ -67,6 +68,6 @@ export function LeafletHeatmapLayer({ reports, reportType, options }: LeafletHea
       map.removeLayer(heatLayer);
     };
   }, [map, reports, reportType, options]); // Chạy lại effect khi map, reports, reportType hoặc options thay đổi
-
+  }
   return null; // Component này không render gì cả, chỉ thêm layer vào map
 }

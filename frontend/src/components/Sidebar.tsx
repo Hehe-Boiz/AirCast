@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { LogOut, Star, Menu, X, TrendingUp, Award, History, Trophy, Target, Flame, Zap, Settings } from 'lucide-react';
@@ -7,7 +7,7 @@ import { Progress } from './ui/progress';
 import { SettingsModal } from './SettingsModal';
 import type { User } from '../App';
 import { usersService } from '../services';
-
+import type { UserStatsResponse } from '../types/api'; // Giả sử bạn có type này
 
 type SidebarProps = {
   user: User;
@@ -19,7 +19,29 @@ type SidebarProps = {
 
 export function Sidebar({ user, onLogout, onUserUpdate, isOpen, onToggle }: SidebarProps) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const userStats = usersService.getUserStats()
+ const [userStats, setUserStats] = useState<UserStatsResponse | null>(null);
+
+  // Dùng useEffect để gọi API khi component được mount
+  useEffect(() => {
+    const fetchUserStats = async () => {
+      try {
+        const stats = await usersService.getUserStats();
+        setUserStats(stats);
+      } catch (error) {
+        console.error("Failed to fetch user stats:", error);
+        // Có thể set một giá trị mặc định hoặc hiển thị lỗi
+        setUserStats({
+            total_reports: 0,
+            accuracy_rate: 0,
+            current_streak: 0,
+            level: 1,
+            reputation: user.reputation,
+        });
+      }
+    };
+
+    fetchUserStats();
+  }, [user.reputation]); // Chạy lại khi reputation thay đổi
   return (
     <>
       {/* Settings Modal */}
@@ -32,7 +54,7 @@ export function Sidebar({ user, onLogout, onUserUpdate, isOpen, onToggle }: Side
 
       {/* Sidebar - Responsive Width */}
       <div
-        className={`fixed md:relative top-0 left-0 h-full md:w-96 w-80 bg-gradient-to-br from-gray-50 to-white border-r border-gray-200 shadow-2xl z-40 transition-transform duration-300 flex flex-col ${
+        className={`fixed md:relative top-0 left-0 h-full md:w-96 w-80 bg-linear-to-br from-gray-50 to-white border-r border-gray-200 shadow-2xl z-40 transition-transform duration-300 flex flex-col ${
           isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
@@ -49,7 +71,7 @@ export function Sidebar({ user, onLogout, onUserUpdate, isOpen, onToggle }: Side
         )}
 
         {/* User Profile - Responsive */}
-        <div className="md:p-6 p-4 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 text-white relative overflow-hidden">
+        <div className="md:p-6 p-4 bg-linear-to-br from-emerald-500 via-teal-500 to-cyan-500 text-white relative overflow-hidden">
           {/* Background decoration */}
           <div className="absolute top-0 right-0 md:w-32 md:h-32 w-24 h-24 bg-white/10 rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 left-0 md:w-24 md:h-24 w-16 h-16 bg-white/5 rounded-full blur-2xl"></div>
@@ -59,7 +81,7 @@ export function Sidebar({ user, onLogout, onUserUpdate, isOpen, onToggle }: Side
               <div className="relative">
                 <Avatar className="md:w-20 md:h-20 w-14 h-14 md:border-4 border-3 border-white/30 shadow-xl">
                   {user.avatar && <AvatarImage src={user.avatar} alt={user.name} />}
-                  <AvatarFallback className="bg-gradient-to-br from-emerald-600 to-teal-700 text-white md:text-2xl text-lg">
+                  <AvatarFallback className="bg-linear-to-br from-emerald-600 to-teal-700 text-white md:text-2xl text-lg">
                     {user.name.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
@@ -103,22 +125,22 @@ export function Sidebar({ user, onLogout, onUserUpdate, isOpen, onToggle }: Side
               {/* endpoint /users/stats */}
                <StatCard
                 title="Tổng báo cáo"
-                value={""}
-                subtitle={""}
+                value={userStats?userStats.total_reports:'...'}
+                subtitle="+3 tuần"
                 icon={<Target className="md:w-6 md:h-6 w-5 h-5 text-white" />}
                 variant="cyan"
               />
               <StatCard
                 title="Độ chính xác"
-                value={""}
-                subtitle={""}
+                value={userStats?.accuracy_rate?? '...'}
+                subtitle={"Xuất sắc"}
                 icon={<Award className="md:w-6 md:h-6 w-5 h-5 text-white" />}
                 variant="emerald"
               />
               <StatCard
                 title="Streak hiện tại"
-                value={""}
-                subtitle={""}
+                value={userStats?.current_streak?? '...'}
+                subtitle={"Tiếp tục phát huy"}
                 icon={<Flame className="md:w-6 md:h-6 w-5 h-5 text-white" />}
                 variant="orange"
               />
@@ -143,7 +165,7 @@ export function Sidebar({ user, onLogout, onUserUpdate, isOpen, onToggle }: Side
                   key={i}
                   className={`aspect-square md:rounded-2xl rounded-xl flex flex-col items-center justify-center border-2 transition-all hover:scale-105 ${
                     achievement.unlocked 
-                      ? 'bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-300 shadow-md cursor-pointer' 
+                      ? 'bg-linear-to-br from-yellow-50 to-orange-50 border-yellow-300 shadow-md cursor-pointer' 
                       : 'bg-gray-100 border-gray-200 opacity-50 grayscale'
                   }`}
                 >

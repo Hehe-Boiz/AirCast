@@ -2,7 +2,7 @@ export function AuthBackground() {
   return (
     <>
       {/* Fixed gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500" />
+      <div className="absolute inset-0 bg-linear-to-br from-emerald-500 via-teal-500 to-cyan-500" />
       
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
