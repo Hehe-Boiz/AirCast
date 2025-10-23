@@ -38,7 +38,7 @@ class ReportDetailed(models.Model):
     downvotes = models.PositiveIntegerField(default=0)
 
     class Meta:
-        ordering = ['-create_at']
+        ordering = ['-created_at']
 
 class UserVote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

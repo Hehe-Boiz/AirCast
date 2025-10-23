@@ -5,4 +5,5 @@ urlpatterns = [
     path('reports/', include('api.reports.urls')),
     path('profiles/', include('api.achievements.urls')),
     path('uploads/', include('api.uploads.urls')),
+    path('aqi/', include('api.aqi.urls')),
 ]

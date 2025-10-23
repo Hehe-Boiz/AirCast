@@ -149,7 +149,7 @@ DATABASES = {
         'NAME': 'aircast',
         'USER': 'aircast',
         'PASSWORD': '123',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }
@@ -185,6 +185,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+OPENWEATHER_API_KEY = "4c6637e31b22164a8cb6e8c290344e60"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
