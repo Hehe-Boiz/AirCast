@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
 :root {
   --font-size: 16px;
   --background: #ffffff;

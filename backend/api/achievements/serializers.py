@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Profile, Achievement, UserAchievement
+from .models import Achievement, UserAchievement
 from ..reports.models import ReportDetailed as Report
 from ..authentication.models import User
 

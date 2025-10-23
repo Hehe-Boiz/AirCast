@@ -23,7 +23,7 @@ services:
     image: aircast-backend
     container_name: aircast-backend
     ports:
-      - "8001:8000"
+      - "3000:8000"
     environment:
       DB_HOST: db
       DB_PORT: 5432

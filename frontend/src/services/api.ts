@@ -62,7 +62,7 @@ class ApiService {
     }
 
     // Handle empty responses (204 No Content)
-    if (response.status === 204) {
+    if (response.status === 204 || response.status === 205) {
       return {} as T;
     }
 
