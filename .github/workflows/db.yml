@@ -1,0 +1,25 @@
+name: Database Setup
+
+on:
+  push:
+    branches: [ CICD ]
+    paths:
+      - 'Backend/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'Backend/**'
+
+jobs:
+  lint-backend:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./posgre_docker
+        shell: bash
+    
+    steps:
+        - name: Setup Database
+          run: |
+            docker-compose up -d
