@@ -1,4 +1,38 @@
-name: backend.yml
+name: Backend CI
+
 on:
+  push:
+    branches: [ CICD ]
+    paths:
+      - 'Backend/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'Backend/**'
 
 jobs:
+  lint-backend:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./Frontend
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Dependencies and Lint
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install flake8
+
+      - name: Run Lint
+        run: flake8 .
+
+      - name: Run Django Tests
+        run: python manage.py test
