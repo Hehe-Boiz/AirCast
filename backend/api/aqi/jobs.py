@@ -1,5 +1,5 @@
 from .models import AqiPoint
-from .helpers import get_aqi_from_openweather
+from .helpers import get_aqi_from_openweather_sync
 
 def update_all_aqi_points():
     """
@@ -12,7 +12,7 @@ def update_all_aqi_points():
     
     for point in points_to_update:
         try:
-            aqi, pm25 = get_aqi_from_openweather(point.lat, point.lon)
+            aqi, pm25 = get_aqi_from_openweather_sync(point.lat, point.lon)
             if aqi is not None:
                 point.aqi = aqi
                 point.pm25 = pm25

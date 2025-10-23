@@ -17,4 +17,4 @@ class AqiPoint(models.Model):
         ordering = ['-updated_at']
 
     def __str__(self):
-        return f"AQI {self.aqi} @ ({self.lat}, {self.lon})"
+        return f"AQI {self.aqi} / PM2.5 {self.pm25} @ ({self.lat}, {self.lon})"

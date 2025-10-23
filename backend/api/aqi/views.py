@@ -12,7 +12,6 @@ from asgiref.sync import sync_to_async, async_to_sync
 class FetchAqiDataView(generics.GenericAPIView):
     serializer_class = AqiBoundingBoxSerializer
 
-    # --- THÊM PHƯƠNG THỨC NÀY VÀO ---
     async def dispatch(self, request, *args, **kwargs):
         """
         Dispatch bất đồng bộ (async-aware) cho GenericAPIView.
@@ -32,7 +31,6 @@ class FetchAqiDataView(generics.GenericAPIView):
             else:
                 handler = self.http_method_not_allowed
             
-            # Đây là thay đổi quan trọng:
             if asyncio.iscoroutinefunction(handler):
                 response = await handler(request, *args, **kwargs)
             else:
@@ -43,7 +41,6 @@ class FetchAqiDataView(generics.GenericAPIView):
 
         self.response = self.finalize_response(request, response, *args, **kwargs)
         return self.response
-    # --- KẾT THÚC PHẦN THÊM MỚI ---
 
     async def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -101,9 +98,9 @@ class FetchAqiDataView(generics.GenericAPIView):
 
             if points_to_update_or_create:
                  try:
-                    await sync_to_async(AqiPoint.objects.bulk_update_or_create)(
+                    await sync_to_async(AqiPoint.objects.bulk_create)(
                         points_to_update_or_create,
-                        ['lat', 'lon'],
+                        unique_fields=['lat', 'lon'],
                         update_fields=['aqi', 'pm25', 'updated_at']
                     )
                  except Exception as db_error:
