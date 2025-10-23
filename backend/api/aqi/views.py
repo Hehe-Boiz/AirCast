@@ -77,7 +77,7 @@ class FetchAqiDataView(generics.GenericAPIView):
             if is_stale:
                 points_to_fetch_api.append((lat, lon))
             else:
-                results[(lat, lon)] = [point.lat, point.lon, point.aqi]
+                results[(lat, lon)] = [point.lat, point.lon, point.aqi, point.pm25]
 
         if points_to_fetch_api:
             async with httpx.AsyncClient() as client:
@@ -88,23 +88,23 @@ class FetchAqiDataView(generics.GenericAPIView):
                 api_results = await asyncio.gather(*tasks)
 
             points_to_update_or_create = []
-            for lat, lon, aqi in api_results:
+            for lat, lon, aqi, pm25 in api_results:
                 if aqi is not None:
-                    results[(lat, lon)] = [lat, lon, aqi]
+                    results[(lat, lon)] = [lat, lon, aqi, pm25]
                     points_to_update_or_create.append(
-                       AqiPoint(lat=lat, lon=lon, aqi=aqi, updated_at=timezone.now()) # Cập nhật updated_at thủ công
+                       AqiPoint(lat=lat, lon=lon, aqi=aqi, pm25=pm25, updated_at=timezone.now()) # Cập nhật updated_at thủ công
                     )
                 else:
                     old_point = existing_points.get((lat, lon))
                     if old_point:
-                         results[(lat, lon)] = [old_point.lat, old_point.lon, old_point.aqi]
+                         results[(lat, lon)] = [old_point.lat, old_point.lon, old_point.aqi, old_point.pm25]
 
             if points_to_update_or_create:
                  try:
                     await sync_to_async(AqiPoint.objects.bulk_update_or_create)(
                         points_to_update_or_create,
                         ['lat', 'lon'],
-                        update_fields=['aqi', 'updated_at']
+                        update_fields=['aqi', 'pm25', 'updated_at']
                     )
                  except Exception as db_error:
                       print(f"Lỗi khi cập nhật DB: {db_error}")

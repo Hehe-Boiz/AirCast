@@ -12,7 +12,7 @@ async def get_aqi_from_openweather_async(lat, lon, client):
     API_KEY = settings.OPENWEATHER_API_KEY
     if not API_KEY or API_KEY == "YOUR_SECRET_API_KEY_HERE":
         print("ERROR: OPENWEATHER_API_KEY chưa được cấu hình.")
-        return None
+        return lat, lon, None, None
 
     url = f"http://api.openweathermap.org/data/2.5/air_pollution?lat={lat}&lon={lon}&appid={API_KEY}"
 
@@ -21,14 +21,15 @@ async def get_aqi_from_openweather_async(lat, lon, client):
         response.raise_for_status()
         data = response.json()
         aqi = data['list'][0]['main']['aqi']
-        return lat, lon, aqi 
+        pm25 = data['list'][0]['components'].get('pm2_5', None)
+        return lat, lon, aqi, pm25
     except httpx.RequestError as e:
         print(f"Lỗi mạng khi gọi OpenWeather API cho ({lat},{lon}): {e}")
     except httpx.HTTPStatusError as e:
         print(f"Lỗi HTTP khi gọi OpenWeather API cho ({lat},{lon}): {e.response.status_code}")
     except Exception as e:
         print(f"Lỗi không xác định khi gọi OpenWeather API cho ({lat},{lon}): {e}")
-    return lat, lon, None
+    return lat, lon, None, None
 
 def calculate_grid_points(lat_min, lon_min, lat_max, lon_max, distance_km=5.0):
     points = []

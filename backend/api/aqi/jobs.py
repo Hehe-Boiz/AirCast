@@ -12,9 +12,10 @@ def update_all_aqi_points():
     
     for point in points_to_update:
         try:
-            aqi = get_aqi_from_openweather(point.lat, point.lon)
+            aqi, pm25 = get_aqi_from_openweather(point.lat, point.lon)
             if aqi is not None:
                 point.aqi = aqi
+                point.pm25 = pm25
                 point.save()
                 updated_count += 1
         except Exception as e:

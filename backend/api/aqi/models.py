@@ -7,7 +7,8 @@ class AqiPoint(models.Model):
     lat = models.FloatField(db_index=True)
     lon = models.FloatField(db_index=True)
     
-    aqi = models.IntegerField(default=1) 
+    aqi = models.IntegerField(default=1)
+    pm25 = models.FloatField(null=True, blank=True)
  
     updated_at = models.DateTimeField(auto_now=True)
 
