@@ -17,7 +17,8 @@ class ReportDetailed(models.Model):
         ('very_loud', 'Very Loud'),
     ]
     USER_VOTE = [
-        "up", "down"
+        ('up', 'Up'),
+            ('down', 'Down'),
     ]
     # one to one với user, nếu người dùng bị xóa thì tất cả báo cáo
     # của họ cũng bị xóa

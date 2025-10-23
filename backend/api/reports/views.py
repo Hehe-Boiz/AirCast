@@ -26,7 +26,7 @@ class ReportListAPIView(generics.ListAPIView):
    # LIMIT 10;
    queryset = ReportDetailed.objects.all()
    serializer_class = ReportDetailedListSerializers 
-   pagination_class = StandardResultSetPaginations
+#    pagination_class = StandardResultSetPaginations
 
 class ReportDetailedRetriveAPIView(generics.RetrieveAPIView):
     # SELECT * FROM reports_reportdetailed WHERE id = 'id' LIMIT 1
