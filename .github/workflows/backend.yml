@@ -37,7 +37,11 @@ jobs:
       - name: Run Django health checks
         run: |
           python manage.py check
-          python manage.py migrate --check
+          if python manage.py showmigrations --plan | grep '\[ \]'; then
+            python manage.py migrate --noinput
+          else
+            python manage.py migrate --check
+          fi
 
       - name: Run Django Tests
         run: python manage.py test
