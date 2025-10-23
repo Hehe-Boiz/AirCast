@@ -18,9 +18,19 @@ export type User = {
   avatar?: string; // URL to avatar image
 };
 
-export type AirQualityLevel = 'good' | 'moderate' | 'unhealthy' | 'very_unhealthy' | 'hazardous';
-export type NoiseLevel = 'quiet' | 'moderate' | 'loud' | 'very_loud';
-
+export  enum AIR_LEVEL{
+    GOOD = 1,
+    MODERATE,
+    UNHEALTHY,
+    VERY_UNHEALTHY,
+    HAZARDOUS
+  }
+export  enum NOISE_LEVEL{
+    QUITE=1,
+    MODERATE,
+    LOUND,
+    VERY_LOUND
+  }
 export type Report = {
   id: string;
   userId: string;
@@ -29,8 +39,8 @@ export type Report = {
   lat: number;
   lng: number;
   type: 'air' | 'noise';
-  airQuality?: AirQualityLevel;
-  noiseLevel?: NoiseLevel;
+  airQuality?: AIR_LEVEL;
+  noiseLevel?: NOISE_LEVEL;
   comment?: string;
   imageUrl?: string;
   audioUrl?: string;
@@ -85,6 +95,7 @@ export default function App() {
   const handleLogout = async () => {
     await authService.logout();
     setUser(null);
+    setShowAuthScreen(false);  
   };
 
   const handleUserUpdate = (updatedUser: Partial<User>) => {
