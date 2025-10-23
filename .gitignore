@@ -2,7 +2,9 @@
 __pycache__/
 *.py[codz]
 *$py.class
-
+*node_modules
+./frontend
+./frontend_bak
 # C extensions
 *.so
 
