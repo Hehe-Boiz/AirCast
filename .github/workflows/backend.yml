@@ -16,7 +16,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./Frontend
+        working-directory: ./Backend
         shell: bash
 
     steps:
