@@ -6,9 +6,31 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD}
+      POSTGRES_PASSWORD: 123
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+  frontend:
+    build: ./frontend
+    image: aircast-frontend
+    container_name: aircast-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+  
+  backend:
+    build: ./backend
+    image: aircast-backend
+    container_name: aircast-backend
+    ports:
+      - "8001:8000"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: aircast
+      DB_USER: aircast
+      DB_PASSWORD: 123
+    depends_on:
+      - db
 volumes:
   postgres_data:
