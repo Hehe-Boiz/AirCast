@@ -8,14 +8,11 @@ on:
 
 jobs:
   lint-backend:
-    runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: ./posgre_docker
-        shell: bash
-    
+    runs-on: ubuntu-latest    
     steps:
+        - name: Check out repository code
+          uses: actions/checkout@v4
+
         - name: Setup Database
           run: |
             docker-compose up -d
