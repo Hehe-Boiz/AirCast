@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { LoginScreen } from './components/LoginScreen';
 import { RegisterScreen } from './components/RegisterScreen';
@@ -50,6 +50,21 @@ export default function App() {
   const [showAuthScreen, setShowAuthScreen] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [loginPromptAction, setLoginPromptAction] = useState<'report' | 'vote'>('report');
+
+  useEffect(() => {
+    // Kiểm tra xem có thông tin user trong localStorage không
+    const currentUser = authService.getCurrentUser();
+    if (currentUser) {
+      // Nếu có, cập nhật lại state của user
+      setUser(currentUser);
+      // Không cần hiển thị màn hình đăng nhập/đăng ký nữa
+      setShowAuthScreen(false);
+    } else {
+      // Nếu không có, hiển thị màn hình đăng nhập (trừ khi họ đã chọn tiếp tục là khách)
+      // Kiểm tra thêm điều kiện nếu bạn có logic "continue as guest" phức tạp hơn
+      setShowAuthScreen(true);
+    }
+  }, []);
 
   const handleLogin = async (email: string, password: string) => {
     const loggedInUser = authService.getCurrentUser();
@@ -110,7 +125,9 @@ export default function App() {
     return (
       <div className="min-h-screen w-full relative overflow-hidden">
         {/* Fixed background layer */}
+        <Toaster/>
         <AuthBackground />
+        
         
         {/* Animated content layer */}
         <div className="relative min-h-screen w-full">

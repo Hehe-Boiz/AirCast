@@ -54,7 +54,7 @@ class ApiService {
           // Redirect to login or clear auth
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
-          window.location.href = '/login';
+          // window.location.href = '/login';
         }
       }
 
