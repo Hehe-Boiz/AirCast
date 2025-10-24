@@ -17,7 +17,35 @@ from .models import ReportDetailed
 #     # Tên này phải khớp với trường trong Model và trong Meta.ordering
 #     'ORDERING': '-create_at',
 # }
+class ReportListCreateAPIView(generics.ListCreateAPIView):
+   # Hỗ trợ cả GET (ListAPIView) và POST (CreateAPIView)
+    queryset = ReportDetailed.objects.all()
+    serializer_class = ReportDetailedListSerializers
+    def perform_create(self, serializer):
+       # THAO TÁC QUAN TRỌNG: Gán user từ request (token) vào field 'user' của model
+       serializer.save(user=self.request.user)
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
+        # 1. Tạo Report và gán user
+        report = serializer.save(user=request.user)
+
+        # 2. Cập nhật điểm uy tín (theo logic Frontend/README)
+        REPUTATION_GAIN = 5
+
+        user = request.user
+        # Sử dụng method có sẵn trong User model để tăng reputation
+        user.increase_reputation(REPUTATION_GAIN) 
+        # Note: Nếu muốn cập nhật total_reports/accuracy_rate, cần gọi user.update_stats()
+
+        # 3. Trả về response theo format yêu cầu của Frontend (src/services/reports.ts)
+        return Response({
+            "id": str(report.id),
+            "message": "Báo cáo đã được tạo thành công",
+            "reputation_gained": REPUTATION_GAIN
+        }, status=status.HTTP_201_CREATED)
 
 #@GET
 class ReportListAPIView(generics.ListAPIView):

@@ -102,17 +102,27 @@ class AuthService {
 
   // Logout
   async logout(): Promise<void> {
-    try {
-      if (!API_CONFIG.USE_MOCK_DATA) {
-        await apiService.post(API_CONFIG.ENDPOINTS.LOGOUT, {});
-      }
-    } finally {
-      // Clear local storage regardless of API call result
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      localStorage.removeItem('user');
-    }
+    const refreshToken = localStorage.getItem('refresh_token');
+    if (!API_CONFIG.USE_MOCK_DATA && refreshToken && refreshToken.length > 0) {
+        try {
+            // Gửi refresh token lên backend để black list (vô hiệu hóa)
+            // Body PHẢI chứa key 'refresh_token' như yêu cầu của Backend
+            await apiService.post(
+              API_CONFIG.ENDPOINTS.LOGOUT, 
+              { refresh_token: refreshToken } 
+            );
+        } catch (error) {
+            // Log lỗi nhưng không re-throw, vì chúng ta vẫn muốn xóa token cục bộ.
+            console.error("Lỗi khi blacklisting token trên server:", error);
+        }
+    } 
+    
+    // 3. Luôn luôn xóa token khỏi local storage
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
   }
+    
 
   // Refresh access token
   async refreshToken(): Promise<string> {

@@ -33,17 +33,17 @@ export  enum NOISE_LEVEL{
   }
 export type Report = {
   id: string;
-  userId: string;
-  userName: string;
-  userReputation: number;
+  user_id: string;
+  user_name: string;
+  user_reputation: number;
   lat: number;
   lng: number;
   type: 'air' | 'noise';
-  airQuality?: AIR_LEVEL;
-  noiseLevel?: NOISE_LEVEL;
+  air_quality?: AIR_LEVEL;
+  noise_level?: NOISE_LEVEL;
   comment?: string;
-  imageUrl?: string;
-  audioUrl?: string;
+  image_url?: string;
+  audio_url?: string;
   timestamp: Date;
   upvotes: number;
   downvotes: number;
@@ -93,9 +93,18 @@ export default function App() {
   };
 
   const handleLogout = async () => {
-    await authService.logout();
-    setUser(null);
-    setShowAuthScreen(false);  
+    try{
+      await authService.logout();
+      setUser(null);
+      setShowAuthScreen(false);
+    }
+    catch(error){
+      console.error(
+        "Logout faield:", error
+      )
+      setUser(null)
+      setShowAuthScreen(false);
+    }
   };
 
   const handleUserUpdate = (updatedUser: Partial<User>) => {

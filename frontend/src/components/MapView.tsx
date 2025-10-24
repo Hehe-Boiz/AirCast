@@ -4,7 +4,6 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaf
 import L from 'leaflet';
 import { Button } from './ui/button';
 import { Plus, Navigation, Menu, X, MapPin, Layers, Filter, Wind, Volume2 } from 'lucide-react'; // Thêm icon
-import { LeafletHeatmapLayer } from './LeafletHeatmapLayer'; // Import component heatmap mới
 // import { ReportMarkers } from './ReportMarkers'; // Giữ lại nếu bạn muốn dùng lại Marker (cần điều chỉnh)
 import { LocationInfo } from './LocationInfo';
 import { Badge } from './ui/badge';
@@ -14,6 +13,7 @@ import {InfoCard} from './InfoCard'
 
 // Import CSS của Leaflet
 import 'leaflet/dist/leaflet.css';
+import { ReportMarkers } from './ReportMarkers';
 
 // Props cho MapView (giữ nguyên)
 type MapViewProps = {
@@ -138,13 +138,13 @@ export function MapView({
     try {
       setIsLoadingReports(true);
       // Lấy báo cáo trong bán kính lớn hơn một chút để heatmap có dữ liệu
-      const response = await reportsService.getReports({
-        lat: Array.isArray(userLocation) ? userLocation[0] : userLocation.lat,
-        lng: Array.isArray(userLocation) ? userLocation[1] : userLocation.lng,
-        radius: 20, // Lấy báo cáo trong bán kính 20km (ví dụ)
-        limit: 200, // Tăng giới hạn để có nhiều điểm cho heatmap
-      });
-      setReports(response.results);
+      const response = await reportsService.getReports();
+      setReports(response.reports);
+      console.log("HEllo");
+      console.log(reports[0]?.air_quality??NaN);
+      (reports || []).forEach((report)=>
+        console.log(report.air_quality)
+      )
     } catch (error) {
       console.error('Failed to load reports:', error);
       // toast.error("Không thể tải danh sách báo cáo");
@@ -163,14 +163,14 @@ export function MapView({
   const initialCenter: L.LatLngExpression = [10.7769, 106.7009];
 
   // Tính toán chất lượng không khí trung bình cho khu vực hiện tại (ví dụ)
-  const nearbyReports = reports.filter(r =>
+  const nearbyReports = (reports||[]).filter(r =>
       Array.isArray(userLocation) &&
       r.type === 'air' &&
       Math.abs(r.lat - userLocation[0]) < 0.01 && // Điều chỉnh ngưỡng nếu cần
       Math.abs(r.lng - userLocation[1]) < 0.01
   );
   const avgNearbyAQI = nearbyReports.length > 0
-    ? nearbyReports.reduce((sum, r) => sum + (r.airQuality === AIR_LEVEL.GOOD ? 1 : r.airQuality === AIR_LEVEL.MODERATE ? 2 : 3), 0) / nearbyReports.length
+    ? nearbyReports.reduce((sum, r) => sum + (r.air_quality === AIR_LEVEL.GOOD ? 1 : r.air_quality === AIR_LEVEL.MODERATE ? 2 : 3), 0) / nearbyReports.length
     : 1; // Giả sử là tốt nếu không có báo cáo
 
   const nearbyAQIStatus = avgNearbyAQI <= 1.5 ? 'Tốt' : avgNearbyAQI <= 2.5 ? 'Trung bình' : 'Kém';
@@ -182,57 +182,35 @@ export function MapView({
         center={userLocation || initialCenter} // Ưu tiên vị trí người dùng
         zoom={14} // Zoom gần hơn một chút
         scrollWheelZoom={true}
-        style={{ height: '100%', width: '100%', zIndex: 10 }}
+        style={{ height: '100%', width: '100%', zIndex: 1000 }}
         className="map-container" // Thêm class để có thể style dễ hơn
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
 
-        {/* Heatmap Layer */}
-        {showHeatmap && !isLoadingReports && (
-          <LeafletHeatmapLayer
-            reports={reports}
-            reportType={currentReportType}
-            options={
-              { 
-                radius: 35,
-                blur: 25,
-                max: 1.0, 
-                gradient: 
-                  currentReportType === 'air' ? undefined : {
-                    0.1: 'blue', 
-                    0.4: 'lime', 
-                    0.7: 'orange', 
-                    1.0: 'red'
-                  } 
-                }
-              } // Tùy chỉnh options, ví dụ gradient cho noise
-          />
-        )}
+     
+        {showMarkers && (reports||[]).length > 0 && (
+          <ReportMarkers
+             reports={reports}
+             onMarkerClick={handleReportMarkerClick}
+             selectedReport={selectedReport}
+             
+           />
+         )}
 
         {/* Markers cho vị trí người dùng và vị trí được chọn */}
         <LocationMarkers userLocation={userLocation} selectedLocation={selectedLocation ? [selectedLocation.lat, selectedLocation.lng] : null}/>
 
         {/* Component xử lý click */}
         <MapClickHandler onClick={handleMapClickInternal} />
-
-        {/* Nếu muốn dùng lại ReportMarkers, cần điều chỉnh nó để dùng <Marker> */}
-        {/* {showMarkers && reports.length > 0 && (
-          <ReportMarkers
-             reports={reports}
-             onMarkerClick={handleReportMarkerClick}
-             selectedReport={selectedReport}
-           />
-         )} */}
-
       </MapContainer>
 
       {/* --- UI Controls --- */}
 
       {/* Top Status Bar */}
-      <div className="absolute md:top-6 top-4 md:left-1/2 left-4 md:-translate-x-1/2 translate-x-0 z-30">
+      <div className="absolute z-10001 md:top-6 top-4 md:left-1/2 left-4 md:-translate-x-1/2 translate-x-0 z-30">
         <div className="bg-white/95 backdrop-blur-xl md:rounded-2xl rounded-xl shadow-lg border border-gray-200/50 md:px-6 md:py-3 px-3 py-2 flex items-center md:gap-6 gap-3">
           <div className="flex items-center md:gap-2 gap-1.5">
             <div className={`md:w-3 md:h-3 w-2.5 h-2.5 rounded-full animate-pulse ${isLoadingReports ? 'bg-yellow-500' : 'bg-green-500'}`}></div>
@@ -253,7 +231,7 @@ export function MapView({
         <Button
           onClick={onSidebarToggle}
           size="icon"
-          className="absolute top-20 left-4 z-30 md:hidden bg-white/95 backdrop-blur-xl text-gray-800 hover:bg-gray-100 shadow-lg rounded-xl w-12 h-12 border border-gray-200/50"
+          className="absolute top-20 z-10001 left-4 z-30 md:hidden bg-white/95 backdrop-blur-xl text-gray-800 hover:bg-gray-100 shadow-lg rounded-xl w-12 h-12 border border-gray-200/50"
           variant="outline"
         >
           <Menu className="w-5 h-5" />
@@ -262,7 +240,7 @@ export function MapView({
 
       {/* Auth Buttons for Guest */}
       {!user && (
-        <div className="absolute md:bottom-8 bottom-6 md:left-8 left-4 z-30 flex gap-2">
+        <div className="absolute md:bottom-8 z-10001 bottom-6 md:left-8 left-4 z-30 flex gap-2">
           <Button
             onClick={() => onShowLoginPrompt?.()}
             size="sm"
@@ -274,7 +252,7 @@ export function MapView({
       )}
 
          {/* Control Buttons (Right Edge) */}
-      <div className="absolute md:bottom-8 md:right-8 bottom-6 right-4 flex flex-col gap-3 z-30">
+      <div className="absolute z-10001 md:bottom-8 md:right-8 bottom-6 right-4 flex flex-col gap-3 z-30">
         {/* Layer Controls */}
         <div className="flex flex-col gap-2 bg-white/95 backdrop-blur-xl rounded-2xl p-2 shadow-xl border border-gray-200/50">
           <Button
@@ -313,7 +291,7 @@ export function MapView({
         <Button
           onClick={handleLocateMe}
           size="lg"
-          className="md:rounded-2xl rounded-xl md:w-14 md:h-14 w-12 h-12 shadow-xl bg-white/95 backdrop-blur-xl text-blue-600 hover:bg-blue-50 border border-blue-200/50"
+          className="md:rounded-2xl z-10001 rounded-xl md:w-14 md:h-14 w-12 h-12 shadow-xl bg-white/95 backdrop-blur-xl text-blue-600 hover:bg-blue-50 border border-blue-200/50"
           variant="outline"
           title="Định vị tôi"
         >
@@ -346,7 +324,7 @@ export function MapView({
       {showLocationInfo && selectedLocation && (
         <LocationInfo
           location={selectedLocation}
-          reports={reports.filter( // Lọc chính xác hơn cho LocationInfo
+          reports={(reports||[]).filter( // Lọc chính xác hơn cho LocationInfo
             r => r.lat === selectedLocation.lat && r.lng === selectedLocation.lng
           )}
           selectedReport={selectedReport} // Truyền selectedReport nếu có
@@ -361,7 +339,7 @@ export function MapView({
       )}
 
       {/* Enhanced Legend */}
-       <div className={`absolute top-4 right-4 bg-white/95 backdrop-blur-2xl rounded-2xl shadow-lg shadow-gray-900/5 z-20 border border-gray-200/60 md:w-64 w-auto max-w-[calc(100vw-3rem)] overflow-hidden transition-all duration-300 ${isLegendExpanded ? 'h-auto' : 'md:h-auto h-[58px]'}`}>
+       <div className={`absolute top-4 z-10001 right-4 bg-white/95 backdrop-blur-2xl rounded-2xl shadow-lg shadow-gray-900/5 z-20 border border-gray-200/60 md:w-64 w-auto max-w-[calc(100vw-3rem)] overflow-hidden transition-all duration-300 ${isLegendExpanded ? 'h-auto' : 'md:h-auto h-[58px]'}`}>
          {/* Subtle gradient overlay */}
          <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/30 via-transparent to-teal-50/20 pointer-events-none"></div>
 

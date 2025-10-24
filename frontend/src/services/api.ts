@@ -45,7 +45,11 @@ class ApiService {
           status_code: response.status,
         };
       }
-
+      console.info(`[API SUCCESS] ${response.url}: Status ${response.status}`); 
+      if (response.status === 204 || response.status === 205) { //
+        return {} as T;
+      }
+    
       // Handle 401 Unauthorized - token expired
       if (response.status === 401) {
         // Attempt to refresh token

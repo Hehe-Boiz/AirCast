@@ -62,57 +62,131 @@ class ReportsService {
     );
   }
 
-  // Get reports with filters
+  // // Get reports with filters
+  // async getReports(params: GetReportsRequest = {}): Promise<GetReportsResponse> {
+  //   // MOCK MODE
+  //   if (API_CONFIG.USE_MOCK_DATA) {
+  //     await new Promise(resolve => setTimeout(resolve, 300));
+      
+  //     let filteredReports = [...mockReports];
+      
+  //     // Filter by location
+  //     if (params.lat && params.lng && params.radius) {
+  //       filteredReports = filteredReports.filter(report => {
+  //         const distance = this.calculateDistance(
+  //           params.lat!,
+  //           params.lng!,
+  //           report.lat,
+  //           report.lng
+  //         );
+  //         return distance <= params.radius!;
+  //       });
+  //     }
+      
+  //     // Filter by type
+  //     if (params.type) {
+  //       filteredReports = filteredReports.filter(r => r.type === params.type);
+  //     }
+      
+  //     // Apply pagination
+  //     const limit = params.limit || 20;
+  //     const offset = params.offset || 0;
+  //     const paginatedReports = filteredReports.slice(offset, offset + limit);
+      
+  //     return {
+  //       count: filteredReports.length,
+  //       next: offset + limit < filteredReports.length ? 'next_url' : null,
+  //       previous: offset > 0 ? 'prev_url' : null,
+  //       reports: paginatedReports,
+  //     };
+  //   }
+
+  //   // REAL API CALL
+  //   const queryParams = new URLSearchParams();
+  //   if (params.lat) queryParams.append('lat', params.lat.toString());
+  //   if (params.lng) queryParams.append('lng', params.lng.toString());
+  //   if (params.radius) queryParams.append('radius', params.radius.toString());
+  //   if (params.type) queryParams.append('type', params.type);
+  //   if (params.limit) queryParams.append('limit', params.limit.toString());
+  //   if (params.offset) queryParams.append('offset', params.offset.toString());
+  //   const endpoint = `${API_CONFIG.ENDPOINTS.REPORTS}?${queryParams.toString()}`;
+  //   console.log(endpoint.toString())
+  //   return apiService.get<GetReportsResponse>(endpoint);
+  // }
+
   async getReports(params: GetReportsRequest = {}): Promise<GetReportsResponse> {
-    // MOCK MODE
-    if (API_CONFIG.USE_MOCK_DATA) {
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      let filteredReports = [...mockReports];
-      
-      // Filter by location
-      if (params.lat && params.lng && params.radius) {
-        filteredReports = filteredReports.filter(report => {
-          const distance = this.calculateDistance(
-            params.lat!,
-            params.lng!,
-            report.lat,
-            report.lng
-          );
-          return distance <= params.radius!;
-        });
-      }
-      
-      // Filter by type
-      if (params.type) {
-        filteredReports = filteredReports.filter(r => r.type === params.type);
-      }
-      
-      // Apply pagination
-      const limit = params.limit || 20;
-      const offset = params.offset || 0;
-      const paginatedReports = filteredReports.slice(offset, offset + limit);
-      
-      return {
-        count: filteredReports.length,
-        next: offset + limit < filteredReports.length ? 'next_url' : null,
-        previous: offset > 0 ? 'prev_url' : null,
-        results: paginatedReports,
-      };
+  // MOCK MODE
+  if (API_CONFIG.USE_MOCK_DATA) {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    let filteredReports = [...mockReports];
+
+    // Lọc vị trí
+    if (params.lat && params.lng && params.radius) {
+      filteredReports = filteredReports.filter(report => {
+        const distance = this.calculateDistance(params.lat!, params.lng!, report.lat, report.lng);
+        return distance <= params.radius!;
+      });
     }
 
-    // REAL API CALL
-    const queryParams = new URLSearchParams();
-    if (params.lat) queryParams.append('lat', params.lat.toString());
-    if (params.lng) queryParams.append('lng', params.lng.toString());
-    if (params.radius) queryParams.append('radius', params.radius.toString());
-    if (params.type) queryParams.append('type', params.type);
-    if (params.limit) queryParams.append('limit', params.limit.toString());
-    if (params.offset) queryParams.append('offset', params.offset.toString());
+    // Lọc loại
+    if (params.type) {
+      filteredReports = filteredReports.filter(r => r.type === params.type);
+    }
 
-    const endpoint = `${API_CONFIG.ENDPOINTS.REPORTS}?${queryParams.toString()}`;
-    return apiService.get<GetReportsResponse>(endpoint);
+    // Phân trang
+    const limit = params.limit ?? 20;
+    const offset = params.offset ?? 0;
+    const paginatedReports = filteredReports.slice(offset, offset + limit);
+
+    return {
+      count: filteredReports.length,
+      next: offset + limit < filteredReports.length ? 'next_url' : null,
+      previous: offset > 0 ? 'prev_url' : null,
+      reports: paginatedReports,
+    };
   }
+
+  const queryParams = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      queryParams.append(key, String(value));
+    }
+  });
+
+  const url = `${API_CONFIG.BASE_URL}/reports/?${queryParams.toString()}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    // ✅ Kiểm tra HTTP response
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status} (${response.statusText})`);
+    }
+
+    // ✅ Kiểm tra định dạng JSON
+    const contentType = response.headers.get('content-type');
+    if (!contentType?.includes('application/json')) {
+      throw new Error(`Unexpected content type: ${contentType}`);
+    }
+
+    const data = await response.json();
+    return {
+      count: data.count ?? 0,
+      next: data.next ?? null,
+      previous: data.previous ?? null,
+      reports: data,
+    };
+  } catch (error) {
+    console.error('❌ Lỗi khi lấy dữ liệu reports:', error);
+    throw error;
+  }
+}
+
 
   // Get reports by location (trong radius cụ thể)
   async getReportsByLocation(

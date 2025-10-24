@@ -112,7 +112,7 @@ export function ReportModal({ isOpen, onClose, user, location, onReportCreated }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl p-0 gap-0 flex flex-col">
+      <DialogContent className="max-w-2xl p-0 z-10001 gap-0 flex flex-col">
         {/* Header */}
         <DialogHeader className="p-6 pb-4 bg-gradient-to-br from-emerald-50 to-teal-50 border-b flex-shrink-0">
           <DialogTitle className="text-2xl text-gray-900">Báo cáo tình trạng môi trường</DialogTitle>

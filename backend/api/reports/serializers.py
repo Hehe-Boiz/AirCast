@@ -1,23 +1,33 @@
+# backend/api/reports/serializers.py
+
 from rest_framework import serializers
 from .models import ReportDetailed
 
 class ReportDetailedListSerializers(serializers.ModelSerializer):
-    lng = serializers.FloatField(source='lon', read_only=True)
-    userName = serializers.CharField(source='user.username', read_only=True)
-    userReputation = serializers.IntegerField(source='user.userprofile.reputation', read_only=True)
-    timestamp = serializers.DateTimeField(source='create_at', read_only=True)
+    # Ánh xạ và đổi tên các trường để khớp với frontend (camelCase)
+    user_id = serializers.CharField(source='user.id', read_only=True)
+    user_name = serializers.CharField(source='user.name', read_only=True)
+    user_reputation = serializers.IntegerField(source='user.reputation', read_only=True)
+    timestamp = serializers.DateTimeField(source='created_at', read_only=True)
+    lng = serializers.FloatField(source='lon') #
+
     class Meta:
         model = ReportDetailed
+        # Đảm bảo tất cả các trường mà frontend cần đều có ở đây
         fields = [
-            "id",
-            "userName", # userId, userName, userReputation
-            "userReputation"
-            "type",
-            "lat",
-            "lon",
-            "air_quality",
-            "noise_level",
-            "timestamp"
+            'id',
+            'user_id',
+            'user_name',
+            'user_reputation',
+            'lat',
+            'lng',
+            'type',
+            'air_quality',
+            'noise_level',
+            'comment',
+            'image_url',
+            'audio_url',
+            'timestamp',
+            'upvotes',
+            'downvotes',
         ]
-
-

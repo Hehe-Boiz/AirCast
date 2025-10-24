@@ -14,7 +14,7 @@ services:
     image: aircast-frontend
     container_name: aircast-frontend
     ports:
-      - "8080:80"
+      - "8081:80"
     depends_on:
       - backend
   

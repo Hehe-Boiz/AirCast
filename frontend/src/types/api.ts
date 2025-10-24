@@ -1,7 +1,7 @@
 // API Request & Response Types
 // Tương ứng với Django serializers
 
-import type { User, Report, AirQualityLevel, NoiseLevel } from '../App';
+import { User, Report, AIR_LEVEL, NOISE_LEVEL} from '../App';
 
 // ==================== Authentication ====================
 
@@ -37,8 +37,8 @@ export interface CreateReportRequest {
   type: 'air' | 'noise';
   lat: number;
   lng: number;
-  air_quality?: AirQualityLevel;
-  noise_level?: NoiseLevel;
+  air_quality?: AIR_LEVEL;
+  noise_level?: NOISE_LEVEL;
   comment?: string;
   image?: File;
   audio?: File;
@@ -63,7 +63,7 @@ export interface GetReportsResponse {
   count: number;
   next: string | null;
   previous: string | null;
-  results: Report[];
+  reports: Report[];
 }
 
 export interface ReportsByLocationRequest {

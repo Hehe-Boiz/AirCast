@@ -26,8 +26,8 @@ export const API_CONFIG = {
     REPORTS_BY_LOCATION: '/reports/by-location/',
     
     // Users
-    USER_STATS: '/users/stats/',
-    USER_ACHIEVEMENTS: '/users/achievements/',
+    USER_STATS: '/auth/profile/',
+    USER_ACHIEVEMENTS: '/profiles/achievements/',
     
     // Uploads
     UPLOAD_IMAGE: '/uploads/image/',
@@ -38,7 +38,7 @@ export const API_CONFIG = {
   TIMEOUT: 30000,
   
   // Mock mode - set to false khi kết nối với Django
-  USE_MOCK_DATA: true,
+  USE_MOCK_DATA: false,
 };
 
 // Headers configuration

@@ -9,7 +9,7 @@ import type { Report } from '../App';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { reportsService } from '../services';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 type LocationInfoProps = {
   location: { lat: number; lng: number };
@@ -135,15 +135,15 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
   const noiseReports = recentReports.filter(r => r.type === 'noise');
 
   const avgAQI = airReports.length > 0
-    ? Math.round(airReports.reduce((sum, r) => sum + getAQILevel(r.airQuality).value, 0) / airReports.length)
+    ? Math.round(airReports.reduce((sum, r) => sum + getAQILevel(r.air_quality?.toString()).value, 0) / airReports.length)
     : null;
 
   const avgNoise = noiseReports.length > 0
-    ? Math.round(noiseReports.reduce((sum, r) => sum + getNoiseLevel(r.noiseLevel).value, 0) / noiseReports.length)
+    ? Math.round(noiseReports.reduce((sum, r) => sum + getNoiseLevel(r.noise_level?.toString()).value, 0) / noiseReports.length)
     : null;
 
   return (
-    <div className="absolute top-0 left-0 w-full md:w-[450px] h-full bg-white shadow-2xl z-40 flex flex-col overflow-hidden">
+    <div className="absolute z-10001 top-0 left-0 w-full md:w-[450px] h-full bg-white shadow-2xl z-40 flex flex-col overflow-hidden">
       {/* Header with gradient background */}
       <div className={`bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 text-white relative overflow-hidden flex-shrink-0 transition-shadow duration-300 ${
         isScrolled ? 'shadow-lg' : ''
@@ -227,7 +227,7 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
               <div className="md:space-y-3 space-y-2">
                 {recentReports.map((report) => {
                   const isSelected = selectedReport?.id === report.id;
-                  const aqiData = report.type === 'air' ? getAQILevel(report.airQuality) : null;
+                  const aqiData = report.type === 'air' ? getAQILevel(report.air_quality?.toString()) : null;
                   
                   return (
                     <Card
@@ -242,13 +242,13 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
                       <div className="flex items-center md:gap-3 gap-2 md:mb-3 mb-2">
                         <Avatar className="md:w-10 md:h-10 w-8 h-8 md:border-2 border border-gray-200">
                           <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white md:text-base text-xs">
-                            {report.userName.charAt(0)}
+                            {report.user_name.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center md:gap-2 gap-1.5">
-                            <span className="md:text-sm text-xs truncate">{report.userName}</span>
-                            {report.userReputation >= 90 && (
+                            <span className="md:text-sm text-xs truncate">{report.user_name}</span>
+                            {report.user_reputation >= 90 && (
                               <Badge variant="secondary" className="md:text-xs text-[10px] bg-yellow-100 text-yellow-700 md:px-2 px-1.5 md:py-0.5 py-0 shrink-0">
                                 ⭐ Chuyên gia
                               </Badge>
@@ -256,7 +256,7 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
                           </div>
                           <div className="flex items-center md:gap-1 gap-0.5 md:text-xs text-[10px] text-gray-500">
                             <Star className="md:w-3 md:h-3 w-2.5 h-2.5 text-yellow-500" fill="currentColor" />
-                            <span>{report.userReputation} điểm</span>
+                            <span>{report.user_reputation} điểm</span>
                           </div>
                         </div>
                         <div className="md:text-xs text-[10px] text-gray-500 flex items-center md:gap-1 gap-0.5 shrink-0">
@@ -266,7 +266,7 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
                       </div>
 
                       {/* Report Content */}
-                      {report.type === 'air' && report.airQuality && aqiData && (
+                      {report.type === 'air' && report.air_quality && aqiData && (
                         <div className="md:mb-3 mb-2">
                           <div className={`inline-flex items-center md:gap-2 gap-1.5 md:px-3 px-2 md:py-2 py-1.5 md:rounded-lg rounded-md bg-gradient-to-r ${aqiData.gradient}`}>
                             <span className="md:text-sm text-xs text-white">🌫️ Không khí: {aqiData.label}</span>
@@ -275,11 +275,11 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
                         </div>
                       )}
 
-                      {report.type === 'noise' && report.noiseLevel && (
+                      {report.type === 'noise' && report.noise_level && (
                         <div className="md:mb-3 mb-2">
                           <Badge variant="secondary" className="bg-blue-100 text-blue-700 md:text-xs text-[10px]">
                             <Volume2 className="md:w-3 md:h-3 w-2.5 h-2.5 md:mr-1 mr-0.5" />
-                            Tiếng ồn: {getNoiseLevel(report.noiseLevel).label} (~{getNoiseLevel(report.noiseLevel).value} dB)
+                            Tiếng ồn: {getNoiseLevel(report.noise_level.toString()).label} (~{getNoiseLevel(report.noise_level.toString()).value} dB)
                           </Badge>
                         </div>
                       )}
@@ -293,10 +293,10 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
                         </div>
                       )}
 
-                      {report.imageUrl && (
+                      {report.image_url && (
                         <div className="md:mb-3 mb-2 relative group">
                           <img
-                            src={report.imageUrl}
+                            src={report.image_url}
                             alt="Báo cáo"
                             className="w-full md:h-48 h-36 object-cover md:rounded-xl rounded-lg border border-gray-200"
                           />
@@ -304,7 +304,7 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
                         </div>
                       )}
 
-                      {report.audioUrl && (
+                      {report.audio_url && (
                         <div className="md:mb-3 mb-2 md:p-3 p-2 bg-gradient-to-br from-blue-50 to-cyan-50 md:rounded-lg rounded-md border border-blue-200">
                           <div className="flex items-center md:gap-3 gap-2">
                             <div className="bg-blue-100 md:p-2 p-1.5 md:rounded-lg rounded-md">
