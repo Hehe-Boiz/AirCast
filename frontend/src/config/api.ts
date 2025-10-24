@@ -30,7 +30,10 @@ export const API_CONFIG = {
     // Users
     USER_STATS: '/auth/profile/',
     USER_ACHIEVEMENTS: '/profiles/achievements/',
+    // AQI
+    AQI_FETCH: '/aqi/fetch/',
     
+
     // Uploads
     UPLOAD_IMAGE: '/uploads/image/',
     UPLOAD_AUDIO: '/uploads/audio/',

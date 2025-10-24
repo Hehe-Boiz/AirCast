@@ -182,10 +182,6 @@ export function LoginScreen({ onLogin, onSwitchToRegister, onContinueAsGuest }: 
                 Tiếp tục với tư cách khách
               </Button>
             )}
-
-            <p className="text-center text-sm text-gray-500 pt-4">
-              💡 Demo: Nhập bất kỳ email & mật khẩu nào để trải nghiệm
-            </p>
           </form>
         </Card>
         </motion.div>

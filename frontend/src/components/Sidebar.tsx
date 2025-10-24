@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { LogOut, Star, Menu, X, TrendingUp, Award, History, Trophy, Target, Flame, Zap, Settings } from 'lucide-react';
@@ -8,8 +8,8 @@ import { SettingsModal } from './SettingsModal';
 import type { User } from '../App';
 import { usersService } from '../services';
 import { USER_LEVEL } from '../services/users';
-
-
+import { API_CONFIG } from '../config/api';
+import {UserStatsResponse } from '../types/api'
 type SidebarProps = {
   user: User;
   onLogout: () => void;
@@ -20,7 +20,15 @@ type SidebarProps = {
 
 export function Sidebar({ user, onLogout, onUserUpdate, isOpen, onToggle }: SidebarProps) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [stats, setStats] = useState<UserStatsResponse | null>(null);
   const userStats = usersService.getUserStats()
+  useEffect(() => {
+    const fetchStats = async () => {
+        const data = await usersService.getUserStats();
+        setStats(data);
+    };
+    fetchStats();
+}, []);
   return (
     <>
       {/* Settings Modal */}
@@ -81,13 +89,13 @@ export function Sidebar({ user, onLogout, onUserUpdate, isOpen, onToggle }: Side
                   <span className="text-white md:text-base text-sm">Điểm uy tín</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="md:text-2xl text-xl text-white">{user.reputation}</span>
+                  <span className="md:text-2xl text-xl text-white">{user.reputation -370}</span>
                   <span className="text-emerald-100 md:text-base text-sm">/100</span>
                 </div>
               </div>
               <Progress value={user.reputation} className="h-2 bg-white/20" />
               <p className="md:text-xs text-[10px] text-emerald-100 md:mt-2 mt-1.5">
-                🔥 Còn {100 - user.reputation} điểm để đạt cấp Chuyên gia
+                🔥 Còn {100 - user.reputation+370} điểm để đạt cấp Chuyên gia
               </p>
             </div>
           </div>
@@ -101,25 +109,25 @@ export function Sidebar({ user, onLogout, onUserUpdate, isOpen, onToggle }: Side
               Thống kê hoạt động
             </h3>
             <div className="md:space-y-3 space-y-2">
-              {/* endpoint /users/stats */}
+              
                <StatCard
                 title="Tổng báo cáo"
-                value={""}
-                subtitle={""}
+                value={stats?.total_reports}
+                subtitle={"Đóng góp"}
                 icon={<Target className="md:w-6 md:h-6 w-5 h-5 text-white" />}
                 variant="cyan"
               />
               <StatCard
                 title="Độ chính xác"
-                value={""}
-                subtitle={""}
+                value={stats?.accuracy_rate}
+                subtitle={"Quá xuất sắc"}
                 icon={<Award className="md:w-6 md:h-6 w-5 h-5 text-white" />}
                 variant="emerald"
               />
               <StatCard
                 title="Streak hiện tại"
-                value={""}
-                subtitle={""}
+                value={stats?.current_streak}
+                subtitle={"Duy trì tiếp bạn nhé"}
                 icon={<Flame className="md:w-6 md:h-6 w-5 h-5 text-white" />}
                 variant="orange"
               />
@@ -158,20 +166,18 @@ export function Sidebar({ user, onLogout, onUserUpdate, isOpen, onToggle }: Side
           <div className="md:pt-4 pt-3 border-t border-gray-200">
             <div className="flex items-center justify-between md:mb-3 mb-2">
               <span className="md:text-sm text-xs text-gray-600">Tiến trình lên cấp</span>
-              {/*const user =  user.getstats
-                user.get_level();
-              */}
-              <span className="md:text-sm text-xs text-emerald-600">Cấp {USER_LEVEL}</span> 
+              {stats?.level}
+              <span className="md:text-sm text-xs text-emerald-600">Cấp {stats?.level??1}</span> 
             </div>
             <div className="relative">
-              <Progress value={user.reputation} className="md:h-3 h-2.5 bg-gray-200" />
+              <Progress value={user.reputation/100} className="md:h-3 h-2.5 bg-gray-200" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="md:text-xs text-[10px] text-white drop-shadow-md">{user.reputation}%</span>
+                <span className="md:text-xs text-[10px] text-white drop-shadow-md">{user.reputation-360}%</span>
               </div>
             </div>
             <div className="flex items-center justify-between md:mt-2 mt-1.5">
-              <span className="md:text-xs text-[10px] text-gray-500">Cấp {USER_LEVEL}</span>
-              <span className="md:text-xs text-[10px] text-gray-500">Cấp {"user+1"}</span>
+              <span className="md:text-xs text-[10px] text-gray-500">Cấp {stats?.level}</span>
+              <span className="md:text-xs text-[10px] text-gray-500">Cấp {stats?.level??0}</span>
             </div>
           </div>
         </div>

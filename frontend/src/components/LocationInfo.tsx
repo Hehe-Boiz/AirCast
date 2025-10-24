@@ -249,7 +249,7 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center md:gap-2 gap-1.5">
                             <span className="md:text-sm text-xs truncate">{report.user_name}</span>
-                            {report.user_reputation >= 90 && (
+                            {report.user_reputation-370 >= 90 && (
                               <Badge variant="secondary" className="md:text-xs text-[10px] bg-yellow-100 text-yellow-700 md:px-2 px-1.5 md:py-0.5 py-0 shrink-0">
                                 ⭐ Chuyên gia
                               </Badge>
@@ -257,7 +257,7 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
                           </div>
                           <div className="flex items-center md:gap-1 gap-0.5 md:text-xs text-[10px] text-gray-500">
                             <Star className="md:w-3 md:h-3 w-2.5 h-2.5 text-yellow-500" fill="currentColor" />
-                            <span>{report.user_reputation} điểm</span>
+                            <span>{report.user_reputation-370} điểm</span>
                           </div>
                         </div>
                         <div className="md:text-xs text-[10px] text-gray-500 flex items-center md:gap-1 gap-0.5 shrink-0">

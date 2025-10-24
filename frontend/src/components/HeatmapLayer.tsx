@@ -1,17 +1,17 @@
-import { Report } from '../App';
+import { AIR_LEVEL, Report } from '../App';
 
 type HeatmapLayerProps = {
   reports: Report[];
 };
 
 export function HeatmapLayer({ reports }: HeatmapLayerProps) {
-  const getAQIValue = (level?: string): number => {
+  const getAQIValue = (level?: AIR_LEVEL): number => {
     switch (level) {
-      case 'good': return 30;
-      case 'moderate': return 75;
-      case 'unhealthy': return 125;
-      case 'very_unhealthy': return 175;
-      case 'hazardous': return 225;
+      case AIR_LEVEL.GOOD: return 30;
+      case AIR_LEVEL.MODERATE: return 75;
+      case AIR_LEVEL.UNHEALTHY: return 125;
+      case AIR_LEVEL.VERY_UNHEALTHY: return 175;
+      case AIR_LEVEL.HAZARDOUS: return 225;
       default: return 50;
     }
   };
@@ -27,7 +27,7 @@ export function HeatmapLayer({ reports }: HeatmapLayerProps) {
   return (
     <div className="absolute inset-0 pointer-events-none">
       {reports.filter(r => r.type === 'air').map((report) => {
-        const aqi = getAQIValue(report.airQuality);
+        const aqi = getAQIValue(report.air_quality);
         const color = getColor(aqi);
         
         return (

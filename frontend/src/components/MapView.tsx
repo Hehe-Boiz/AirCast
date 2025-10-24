@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaf
 import L from 'leaflet';
 import { Button } from './ui/button';
 import { Plus, Navigation, Menu, X, MapPin, Layers, Filter, Wind, Volume2 } from 'lucide-react'; // Thêm icon
-// import { AqiHeatmapLayer } from './AqiHeatmapLayer'; // Heatmap AQI từ API /aqi/fetch
+import { AqiHeatmapLayer } from './AqiHeatmapLayer'; // Heatmap AQI từ API /aqi/fetch
 import { ReportMarkers } from './ReportMarkers'; // Giữ lại nếu bạn muốn dùng lại Marker (cần điều chỉnh)
 import { LocationInfo } from './LocationInfo';
 import { Badge } from './ui/badge';
@@ -187,7 +187,7 @@ export function MapView({
         />
 
         {/* Heatmap Layer - AQI (leaflet.heat) */}
-        {/* {showHeatmap && (
+        {showHeatmap && (
           <AqiHeatmapLayer
             options={{
               radius: 35,
@@ -196,7 +196,7 @@ export function MapView({
             }}
             fetchBoundsPadding={0.0}
           />
-        )} */}
+        )}
 
         {/* Markers cho vị trí người dùng và vị trí được chọn */}
         <LocationMarkers userLocation={userLocation} selectedLocation={selectedLocation ? [selectedLocation.lat, selectedLocation.lng] : null}/>
