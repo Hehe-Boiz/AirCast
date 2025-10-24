@@ -33,7 +33,6 @@ AirCast cung cấp cho người dùng bản đồ nhiệt tương tác hiển th
   - React
   - TypeScript
   - Vite
-  - MapboxGL
   - Tailwind CSS
 - **Backend:**
   - Django
