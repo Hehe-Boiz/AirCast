@@ -41,6 +41,7 @@ class ReportListCreateAPIView(generics.ListCreateAPIView):
 
         user = request.user
         # Sử dụng method có sẵn trong User model để tăng reputation
+    
         user.increase_reputation(REPUTATION_GAIN) 
         # Note: Nếu muốn cập nhật total_reports/accuracy_rate, cần gọi user.update_stats()
 

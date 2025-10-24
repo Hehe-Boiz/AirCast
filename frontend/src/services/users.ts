@@ -13,7 +13,7 @@ import type {
   UploadAvatarResponse,
 } from '../types/api';
 import type { User } from '../App';
-
+export let USER_LEVEL = 1;
 class UsersService {
   // ==================== Profile Management ====================
   
@@ -120,10 +120,12 @@ class UsersService {
     // current_streak: 12,
     // level: 8,
     // reputation: 85,
-
+    
     // REAL API CALL
+    USER_LEVEL = (await apiService.get<UserStatsResponse>(API_CONFIG.ENDPOINTS.USER_PROFILE)).level
     return apiService.get<UserStatsResponse>(API_CONFIG.ENDPOINTS.USER_STATS);
   }
+  
 
   // Get user achievements
   async getUserAchievements(): Promise<UserAchievementsResponse> {

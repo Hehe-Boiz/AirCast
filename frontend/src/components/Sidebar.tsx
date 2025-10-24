@@ -7,6 +7,7 @@ import { Progress } from './ui/progress';
 import { SettingsModal } from './SettingsModal';
 import type { User } from '../App';
 import { usersService } from '../services';
+import { USER_LEVEL } from '../services/users';
 
 
 type SidebarProps = {
@@ -160,7 +161,7 @@ export function Sidebar({ user, onLogout, onUserUpdate, isOpen, onToggle }: Side
               {/*const user =  user.getstats
                 user.get_level();
               */}
-              <span className="md:text-sm text-xs text-emerald-600">Cấp {"user.get_level() +1"}</span> 
+              <span className="md:text-sm text-xs text-emerald-600">Cấp {USER_LEVEL}</span> 
             </div>
             <div className="relative">
               <Progress value={user.reputation} className="md:h-3 h-2.5 bg-gray-200" />
@@ -169,7 +170,7 @@ export function Sidebar({ user, onLogout, onUserUpdate, isOpen, onToggle }: Side
               </div>
             </div>
             <div className="flex items-center justify-between md:mt-2 mt-1.5">
-              <span className="md:text-xs text-[10px] text-gray-500">Cấp {"user"}</span>
+              <span className="md:text-xs text-[10px] text-gray-500">Cấp {USER_LEVEL}</span>
               <span className="md:text-xs text-[10px] text-gray-500">Cấp {"user+1"}</span>
             </div>
           </div>
