@@ -31,3 +31,12 @@ class ReportDetailedListSerializers(serializers.ModelSerializer):
             'upvotes',
             'downvotes',
         ]
+
+class ReportVoteListSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = ReportDetailed
+        fields = [
+            'upvotes',
+            'downvotes'
+        ]
+

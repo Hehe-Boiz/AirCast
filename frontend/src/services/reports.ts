@@ -11,6 +11,8 @@ import type {
   ReportsByLocationRequest,
   UploadImageResponse,
   UploadAudioResponse,
+  VoteReport,
+  VoteAction
 } from '../types/api';
 import type { Report } from '../App';
 import { mockReports } from '../data/mockData';
@@ -62,58 +64,39 @@ class ReportsService {
     );
   }
 
-  // // Get reports with filters
-  // async getReports(params: GetReportsRequest = {}): Promise<GetReportsResponse> {
-  //   // MOCK MODE
-  //   if (API_CONFIG.USE_MOCK_DATA) {
-  //     await new Promise(resolve => setTimeout(resolve, 300));
-      
-  //     let filteredReports = [...mockReports];
-      
-  //     // Filter by location
-  //     if (params.lat && params.lng && params.radius) {
-  //       filteredReports = filteredReports.filter(report => {
-  //         const distance = this.calculateDistance(
-  //           params.lat!,
-  //           params.lng!,
-  //           report.lat,
-  //           report.lng
-  //         );
-  //         return distance <= params.radius!;
-  //       });
-  //     }
-      
-  //     // Filter by type
-  //     if (params.type) {
-  //       filteredReports = filteredReports.filter(r => r.type === params.type);
-  //     }
-      
-  //     // Apply pagination
-  //     const limit = params.limit || 20;
-  //     const offset = params.offset || 0;
-  //     const paginatedReports = filteredReports.slice(offset, offset + limit);
-      
-  //     return {
-  //       count: filteredReports.length,
-  //       next: offset + limit < filteredReports.length ? 'next_url' : null,
-  //       previous: offset > 0 ? 'prev_url' : null,
-  //       reports: paginatedReports,
-  //     };
-  //   }
+  async voteReport(id:string, action:VoteAction ): Promise<VoteReport>{
+    //  const { id, action } = reportVoteData;
 
-  //   // REAL API CALL
-  //   const queryParams = new URLSearchParams();
-  //   if (params.lat) queryParams.append('lat', params.lat.toString());
-  //   if (params.lng) queryParams.append('lng', params.lng.toString());
-  //   if (params.radius) queryParams.append('radius', params.radius.toString());
-  //   if (params.type) queryParams.append('type', params.type);
-  //   if (params.limit) queryParams.append('limit', params.limit.toString());
-  //   if (params.offset) queryParams.append('offset', params.offset.toString());
-  //   const endpoint = `${API_CONFIG.ENDPOINTS.REPORTS}?${queryParams.toString()}`;
-  //   console.log(endpoint.toString())
-  //   return apiService.get<GetReportsResponse>(endpoint);
-  // }
+    if (API_CONFIG.USE_MOCK_DATA) {
+      // Giả lập delay
+      await new Promise((r) => setTimeout(r, 200));
 
+      const target = mockReports.find(r => r.id === id);
+      if (!target) throw new Error('Report not found (MOCK)');
+    }
+
+    // API thật
+    const url = `${API_CONFIG.BASE_URL}/reports/${id}/${action}/`;
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+
+      },
+      credentials: 'include', // nếu dùng cookie session
+    });
+
+    if (!res.ok) {
+      const msg = await res.text().catch(() => '');
+      throw new Error(`Vote failed: ${res.status} ${msg || res.statusText}`);
+    }
+
+    // Server trả về { upvotes, downvotes }
+    const data: { upvotes: number; downvotes: number } = await res.json();
+
+    return { id, action, ...data };
+  }
   async getReports(params: GetReportsRequest = {}): Promise<GetReportsResponse> {
   // MOCK MODE
   if (API_CONFIG.USE_MOCK_DATA) {
@@ -273,54 +256,6 @@ class ReportsService {
     return deg * (Math.PI / 180);
   }
 
-  // Vote on report (validate or dispute)
-  async voteReport(reportId: string, voteType: 'up' | 'down'): Promise<{ success: boolean; upvotes: number; downvotes: number }> {
-    // MOCK MODE
-    if (API_CONFIG.USE_MOCK_DATA) {
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      const report = mockReports.find(r => r.id === reportId);
-      if (!report) throw new Error('Report not found');
-      
-      // Toggle vote
-      if (report.userVote === voteType) {
-        // Remove vote
-        if (voteType === 'up') {
-          report.upvotes--;
-        } else {
-          report.downvotes--;
-        }
-        report.userVote = null;
-      } else {
-        // Remove previous vote if exists
-        if (report.userVote === 'up') {
-          report.upvotes--;
-        } else if (report.userVote === 'down') {
-          report.downvotes--;
-        }
-        
-        // Add new vote
-        if (voteType === 'up') {
-          report.upvotes++;
-        } else {
-          report.downvotes++;
-        }
-        report.userVote = voteType;
-      }
-      
-      return {
-        success: true,
-        upvotes: report.upvotes,
-        downvotes: report.downvotes,
-      };
-    }
-
-    // REAL API CALL
-    return apiService.post<{ success: boolean; upvotes: number; downvotes: number }>(
-      `/api/reports/${reportId}/vote/`,
-      { vote_type: voteType }
-    );
-  }
 }
 
 export const reportsService = new ReportsService();

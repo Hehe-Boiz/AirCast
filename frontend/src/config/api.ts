@@ -24,7 +24,9 @@ export const API_CONFIG = {
     REPORTS: '/reports/',
     REPORT_DETAIL: (id: string) => `/reports/${id}/`,
     REPORTS_BY_LOCATION: '/reports/by-location/',
-    
+    REPORT_UP_VOTE: (id:string) => `/reports/${id}/upvote/`,
+    REPORT_DOWN_VOTE:(id:string) => `/reports/${id}/downvote/`,
+    // REPORT_VOTE: (id:string) => `/reports/${id}/vote/`,
     // Users
     USER_STATS: '/auth/profile/',
     USER_ACHIEVEMENTS: '/profiles/achievements/',

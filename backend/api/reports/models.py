@@ -47,3 +47,4 @@ class UserVote(models.Model):
 
     class Meta:
         unique_together = ('user', 'report')
+

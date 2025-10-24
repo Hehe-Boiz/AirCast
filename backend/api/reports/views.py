@@ -1,9 +1,13 @@
 from django.shortcuts import render
-from rest_framework import generics, status
+from rest_framework import generics, status, viewsets, views
 from rest_framework.response import Response
-from .serializers import ReportDetailedListSerializers
+from .serializers import ReportDetailedListSerializers, ReportVoteListSerializers
 from .paginations import StandardResultSetPaginations
-from .models import ReportDetailed
+from .models import ReportDetailed, UserVote
+from rest_framework.permissions import IsAuthenticated
+from django.db import transaction
+from django.db.models import F
+from django.shortcuts import get_object_or_404
 
 # # settings.py
 # REST_FRAMEWORK = {
@@ -88,4 +92,34 @@ class ReportDetailedGenericAPIView(generics.GenericAPIView):
 
         outser_data = self.result_serializers_class(qs, many=True)
         return Response(outser_data.data, status=status.HTTPS_200_OK)
+
+
+
+    
+class ReportUpvoteAPIView(views.APIView):
+    def post(self, request, id):
+        try:
+            report = ReportDetailed.objects.get(pk=id)
+            report.upvotes += 1
+            report.save()
+            serializer = ReportVoteListSerializers(report)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ReportDetailed.DoesNotExist:
+            return Response({'error': 'Report not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ReportDownvoteAPIView(views.APIView):
+    def post(self, request, id):
+        try:
+            report = ReportDetailed.objects.get(pk=id)
+            report.downvotes += 1
+            report.save()
+            serializer = ReportVoteListSerializers(report)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ReportDetailed.DoesNotExist:
+            return Response({'error': 'Report not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 

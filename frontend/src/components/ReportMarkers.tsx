@@ -155,7 +155,11 @@ export function ReportMarkers({ reports, onMarkerClick, selectedReport }: Report
             key={report.id}
             position={[report.lat, report.lng]}
             icon={icon}
-            eventHandlers={{ click: () => onMarkerClick(report) }}
+            eventHandlers={{ click: () => {
+              
+              console.log(report.air_quality) 
+              onMarkerClick(report) }}
+            }
           />
         );
       })}

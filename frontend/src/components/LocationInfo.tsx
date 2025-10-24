@@ -5,11 +5,12 @@ import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { ScrollArea } from './ui/scroll-area';
 import { Avatar, AvatarFallback } from './ui/avatar';
-import type { Report } from '../App';
+import { AIR_LEVEL, NOISE_LEVEL, Report } from '../App';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { reportsService } from '../services';
 import { toast } from 'sonner';
+import { VoteAction } from '../types/api';
 
 type LocationInfoProps = {
   location: { lat: number; lng: number };
@@ -61,7 +62,7 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
     }
   }, [reports]);
 
-  const handleVote = async (reportId: string, voteType: 'up' | 'down') => {
+  const handleVote = async (reportId: string, voteType:VoteAction) => {
     // Check if user is logged in
     if (onShowLoginPrompt) {
       onShowLoginPrompt();
@@ -72,7 +73,7 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
     try {
       const result = await reportsService.voteReport(reportId, voteType);
       
-      if (voteType === 'up') {
+      if (voteType === 'upvote') {
         toast.success('✅ Đã xác nhận báo cáo chính xác', {
           description: 'Cảm ơn bạn đã đóng góp xác minh!',
         });
@@ -94,32 +95,32 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
       setVotingReport(null);
     }
   };
-  const getAQILevel = (level?: string): { value: number; label: string; color: string; gradient: string } => {
+  const getAQILevel = (level?: AIR_LEVEL): { value: number; label: string; color: string; gradient: string } => {
     switch (level) {
-      case 'good':
+      case AIR_LEVEL.GOOD:
         return { value: 30, label: 'Tốt', color: 'bg-green-500', gradient: 'from-green-500 to-emerald-600' };
-      case 'moderate':
+      case AIR_LEVEL.MODERATE:
         return { value: 75, label: 'Trung bình', color: 'bg-yellow-500', gradient: 'from-yellow-500 to-orange-500' };
-      case 'unhealthy':
+      case AIR_LEVEL.UNHEALTHY:
         return { value: 125, label: 'Kém', color: 'bg-orange-500', gradient: 'from-orange-500 to-red-500' };
-      case 'very_unhealthy':
+      case AIR_LEVEL.VERY_UNHEALTHY:
         return { value: 175, label: 'Xấu', color: 'bg-red-500', gradient: 'from-red-500 to-rose-600' };
-      case 'hazardous':
+      case AIR_LEVEL.HAZARDOUS:
         return { value: 225, label: 'Nguy hại', color: 'bg-purple-500', gradient: 'from-purple-500 to-pink-600' };
       default:
         return { value: 50, label: 'Trung bình', color: 'bg-gray-500', gradient: 'from-gray-500 to-gray-600' };
     }
   };
 
-  const getNoiseLevel = (level?: string): { value: number; label: string } => {
+  const getNoiseLevel = (level?: NOISE_LEVEL): { value: number; label: string } => {
     switch (level) {
-      case 'quiet':
+      case NOISE_LEVEL.QUITE:
         return { value: 40, label: 'Yên tĩnh' };
-      case 'moderate':
+      case NOISE_LEVEL.MODERATE:
         return { value: 60, label: 'Trung bình' };
-      case 'loud':
+      case NOISE_LEVEL.LOUND:
         return { value: 80, label: 'Ồn' };
-      case 'very_loud':
+      case NOISE_LEVEL.VERY_LOUND:
         return { value: 100, label: 'Rất ồn' };
       default:
         return { value: 50, label: 'Trung bình' };
@@ -135,11 +136,11 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
   const noiseReports = recentReports.filter(r => r.type === 'noise');
 
   const avgAQI = airReports.length > 0
-    ? Math.round(airReports.reduce((sum, r) => sum + getAQILevel(r.air_quality?.toString()).value, 0) / airReports.length)
+    ? Math.round(airReports.reduce((sum, r) => sum + getAQILevel(r.air_quality).value, 0) / airReports.length)
     : null;
 
   const avgNoise = noiseReports.length > 0
-    ? Math.round(noiseReports.reduce((sum, r) => sum + getNoiseLevel(r.noise_level?.toString()).value, 0) / noiseReports.length)
+    ? Math.round(noiseReports.reduce((sum, r) => sum + getNoiseLevel(r.noise_level).value, 0) / noiseReports.length)
     : null;
 
   return (
@@ -227,7 +228,7 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
               <div className="md:space-y-3 space-y-2">
                 {recentReports.map((report) => {
                   const isSelected = selectedReport?.id === report.id;
-                  const aqiData = report.type === 'air' ? getAQILevel(report.air_quality?.toString()) : null;
+                  const aqiData = report.type === 'air' ? getAQILevel(report.air_quality) : null;
                   
                   return (
                     <Card
@@ -279,7 +280,7 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
                         <div className="md:mb-3 mb-2">
                           <Badge variant="secondary" className="bg-blue-100 text-blue-700 md:text-xs text-[10px]">
                             <Volume2 className="md:w-3 md:h-3 w-2.5 h-2.5 md:mr-1 mr-0.5" />
-                            Tiếng ồn: {getNoiseLevel(report.noise_level.toString()).label} (~{getNoiseLevel(report.noise_level.toString()).value} dB)
+                            Tiếng ồn: {getNoiseLevel(report.noise_level).label} (~{getNoiseLevel(report.noise_level).value} dB)
                           </Badge>
                         </div>
                       )}
@@ -324,7 +325,7 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleVote(report.id, 'up')}
+                            onClick={() => handleVote(report.id, 'upvote')}
                             disabled={votingReport === report.id}
                             className={`md:gap-1.5 gap-1 md:h-9 h-7 md:px-3 px-2 ${
                               report.userVote === 'up'
@@ -339,7 +340,7 @@ export function LocationInfo({ location, reports, selectedReport, onClose, onRep
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleVote(report.id, 'down')}
+                            onClick={() => handleVote(report.id, 'downvote')}
                             disabled={votingReport === report.id}
                             className={`md:gap-1.5 gap-1 md:h-9 h-7 md:px-3 px-2 ${
                               report.userVote === 'down'

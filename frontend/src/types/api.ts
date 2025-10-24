@@ -43,7 +43,14 @@ export interface CreateReportRequest {
   image?: File;
   audio?: File;
 }
+export type VoteAction = 'upvote' | 'downvote';
 
+export interface VoteReport{
+  id: string;
+  action:VoteAction;
+  upvotes ?: number;
+  downvotes?: number
+}
 export interface CreateReportResponse {
   id: string;
   message: string;
