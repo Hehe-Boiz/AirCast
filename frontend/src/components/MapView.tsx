@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaf
 import L from 'leaflet';
 import { Button } from './ui/button';
 import { Plus, Navigation, Menu, X, MapPin, Layers, Filter, Wind, Volume2 } from 'lucide-react'; // Thêm icon
-import { LeafletHeatmapLayer } from './LeafletHeatmapLayer'; // Import component heatmap mới
+import { AqiHeatmapLayer } from './AqiHeatmapLayer'; // Heatmap AQI từ API /aqi/fetch
 // import { ReportMarkers } from './ReportMarkers'; // Giữ lại nếu bạn muốn dùng lại Marker (cần điều chỉnh)
 import { LocationInfo } from './LocationInfo';
 import { Badge } from './ui/badge';
@@ -92,7 +92,7 @@ export function MapView({
   const [reports, setReports] = useState<Report[]>([]);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [showLocationInfo, setShowLocationInfo] = useState(false);
-  const [showHeatmap, setShowHeatmap] = useState(true);
+  const [showHeatmap, setShowHeatmap] = useState(false);
   const [showMarkers, setShowMarkers] = useState(true); // Giữ lại state này, có thể dùng cho ReportMarkers sau này
   const [isLoadingReports, setIsLoadingReports] = useState(true);
   const [isLegendExpanded, setIsLegendExpanded] = useState(false);
@@ -190,25 +190,15 @@ export function MapView({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {/* Heatmap Layer */}
-        {showHeatmap && !isLoadingReports && (
-          <LeafletHeatmapLayer
-            reports={reports}
-            reportType={currentReportType}
-            options={
-              { 
-                radius: 35,
-                blur: 25,
-                max: 1.0, 
-                gradient: 
-                  currentReportType === 'air' ? undefined : {
-                    0.1: 'blue', 
-                    0.4: 'lime', 
-                    0.7: 'orange', 
-                    1.0: 'red'
-                  } 
-                }
-              } // Tùy chỉnh options, ví dụ gradient cho noise
+        {/* Heatmap Layer - AQI (leaflet.heat) */}
+        {showHeatmap && (
+          <AqiHeatmapLayer
+            options={{
+              radius: 35,
+              blur: 25,
+              max: 1.0
+            }}
+            fetchBoundsPadding={0.0}
           />
         )}
 

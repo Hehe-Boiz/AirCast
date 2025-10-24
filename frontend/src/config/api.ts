@@ -4,7 +4,7 @@
 export const API_CONFIG = {
   // Django Backend URL
   // Trong production, thay đổi URL này hoặc sử dụng environment config
-  BASE_URL: 'http://localhost:8000/api',
+  BASE_URL: 'http://localhost:3000/api',
   
   // API Endpoints
   ENDPOINTS: {
@@ -24,6 +24,9 @@ export const API_CONFIG = {
     REPORTS: '/reports/',
     REPORT_DETAIL: (id: string) => `/reports/${id}/`,
     REPORTS_BY_LOCATION: '/reports/by-location/',
+    
+    // AQI
+    AQI_FETCH: '/aqi/fetch/',
     
     // Users
     USER_STATS: '/users/stats/',

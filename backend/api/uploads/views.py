@@ -18,7 +18,7 @@ class UploadImageView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save(report=self.request.report)
 
 class UploadAudioView(generics.CreateAPIView):
     serializer_class = UploadAudioSerializer
@@ -31,4 +31,4 @@ class UploadAudioView(generics.CreateAPIView):
         if audio_file:
             duration = get_audio_duration(audio_file)
             
-        serializer.save(user=self.request.user, duration=duration)
+        serializer.save(report=self.request.report, duration=duration)
